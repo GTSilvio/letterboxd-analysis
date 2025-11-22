@@ -1,53 +1,49 @@
 # report/dashboard.py
 
+import os
+from pathlib import Path
 from dash import Dash
 from report.data_loader import load_stats
 from report.layout.main_layout import create_layout
 from report.callbacks.charts import register_chart_callbacks
 from report.callbacks.interactions import register_interaction_callbacks
-from pathlib import Path
 
-class CreateDashboard:
-    """
-    Main Dash dashboard class.
+"""
+Render-Ready Dashboard
 
-    Usage:
-        dashboard = CreateDashboard(user="gsilvio", year=2025, report=True)
-        dashboard.run_dashboard()
-    """
+- Reads defaults from environment variables:
+    LETTERBOXD_USER (default: "gsilvio")
+    LETTERBOXD_YEAR (default: 2025)
+- Loads the corresponding stats JSON
+- Builds layout and registers callbacks
+- Exposes `server` for Gunicorn deployment
+"""
 
-    def __init__(self, user: str, year: int, report: bool = True):
-        self.user = user
-        self.year = year
-        self.report = report
+# Read defaults from environment variables
+USER = os.getenv("LETTERBOXD_USER", "gsilvio")
+YEAR = int(os.getenv("LETTERBOXD_YEAR", 2025))
 
-        # Determine base path for cache
-        # Assumes letterboxd_analysis/cache/ is a sibling to report/
-        self.cache_dir = Path(__file__).resolve().parent.parent / "cache"
+# Determine cache directory relative to this file
+CACHE_DIR = Path(__file__).resolve().parent.parent / "cache"
 
-    def run_dashboard(self):
-        """
-        Load stats JSON, build the layout, register callbacks, and run Dash.
-        """
-        # Load stats dynamically based on user and year
-        stats = load_stats(
-            cache_dir=str(self.cache_dir),
-            profile=self.user,
-            year=self.year
-        )
+# Load stats JSON
+stats = load_stats(
+    cache_dir=str(CACHE_DIR),
+    profile=USER,
+    year=YEAR
+)
 
-        # Create Dash app
-        app = Dash(__name__)
-        app.layout = create_layout(stats)
+# Create Dash app
+app = Dash(__name__)
+app.layout = create_layout(stats)
 
-        # Register callbacks
-        register_chart_callbacks(app, stats)
-        register_interaction_callbacks(app, stats)
+# Register callbacks
+register_chart_callbacks(app, stats)
+register_interaction_callbacks(app, stats)
 
-        # Run locally for debugging only
-        if self.report:
-            # Uncomment below for local testing
-            # app.run(debug=True, host="0.0.0.0", port=8050)
-            pass
+# Expose server for Render / Gunicorn
+server = app.server
 
-        return app  # Return app object so Render can use it
+# Optional: allow running locally for testing
+if __name__ == "__main__":
+    app.run(debug=True, host="0.0.0.0", port=8050)

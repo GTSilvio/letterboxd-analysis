@@ -1,6 +1,6 @@
 import argparse
 from analysis.orchestrator import LetterboxdAnalysis
-from report.dashboard import create_dashboard
+from report.dashboard import app
 
 def main():
     parser = argparse.ArgumentParser(description="Analyze your Letterboxd data")
@@ -18,8 +18,8 @@ def main():
 
     
     if args.report:
-        dashboard = create_dashboard(args.user, args.year, report=args.report)
-        dashboard.run_dashboard()
+        app.run(debug=True, host="0.0.0.0", port=8050)
+
     
 
 if __name__ == "__main__":
