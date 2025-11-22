@@ -2,3 +2,4 @@ letterboxdpy
 dash
 plotly
 pandas
+gunicorn
