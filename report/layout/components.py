@@ -6,10 +6,11 @@ def header_component(stats: dict):
         [
             html.H1(
                 f"{stats['info']['year']}",
-                style={"fontSize": "48px", "marginBottom": "10px"}
+                style={"fontSize": "144px", "marginBottom": "10px"}
             ),
+            html.P(f"User: {stats['info']['display_name']}", style={"fontSize": "18px", "textAlign": "center"}),
 
-            html.P(f"User: {stats['info']['display_name']}"),
+            
             html.P(f"{stats['stats']['yearly_movie_count']} Movies"),
             html.P(f"{stats['stats']['yearly_review']} Reviews"),
             html.P(f"{stats['stats']['yearly_like']} Likes"),
