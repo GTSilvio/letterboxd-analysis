@@ -31,6 +31,7 @@ def create_layout(stats: dict):
         style={
         "backgroundColor": "#2b2b2b",  # dark full-page background
         "minHeight": "100vh",          # ensure it covers the full viewport
+        "display": "flex",
         "color": "white",              # text color everywhere
         "padding": "20px",
         }
