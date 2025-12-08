@@ -26,7 +26,7 @@ def create_layout(stats: dict):
     return html.Div([
         header_component(stats),
 
-        html.H2("Your Dashboard"),
+        html.H2("Your Dashboard")],
 
         style={
             "backgroundColor": "#2b2b2b",  # dark background
@@ -34,4 +34,4 @@ def create_layout(stats: dict):
 
         #dcc.Graph(id="rating-distribution"),
         #html.Div(id="rating-table-output"),  # Table updates when chart clicked
-    ])
+    )
