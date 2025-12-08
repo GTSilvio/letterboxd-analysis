@@ -15,14 +15,9 @@ def header_component(stats: dict):
                 f"{stats['stats']['yearly_review']} Reviews"
                 f"{stats['stats']['yearly_like']} Likes"
                 f"{round((stats['stats']['yearly_minutes_watched']/60), 1)} Hours"
-                   ),
+                   )
 
-            """
-            html.P(f"{stats['stats']['yearly_movie_count']} Movies"),
-            html.P(f"{stats['stats']['yearly_review']} Reviews"),
-            html.P(f"{stats['stats']['yearly_like']} Likes"),
-            html.P(f"{round((stats['stats']['yearly_minutes_watched']/60), 1)} Hours"),
-            """
+            
         ],
         
         style={
@@ -33,3 +28,10 @@ def header_component(stats: dict):
             "borderRadius": "8px",
         }
     )
+
+"""
+            html.P(f"{stats['stats']['yearly_movie_count']} Movies"),
+            html.P(f"{stats['stats']['yearly_review']} Reviews"),
+            html.P(f"{stats['stats']['yearly_like']} Likes"),
+            html.P(f"{round((stats['stats']['yearly_minutes_watched']/60), 1)} Hours"),
+            """
