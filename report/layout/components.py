@@ -35,7 +35,7 @@ def header_component(stats: dict):
             ),
 
             html.P(
-                f"User: {stats['info']['display_name']}",
+                f"{stats['info']['display_name']}'s Letterboxd Wrapped {stats['info']['year']}",
                 style={"fontSize": "18px", "textAlign": "center"}
             ),
 
