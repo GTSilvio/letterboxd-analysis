@@ -16,7 +16,10 @@ def header_component(stats: dict):
         123 reviews
     """
     return html.Div([
-        html.H1(f"Letterboxd Report for {stats["info"]["display_name"]}"),
-        html.P(f"Year: {stats["info"]['year']}"),
-        html.P(f"Total Reviews: {stats["stats"]['yearly_movie_count']}")
+        html.H1(f"{stats["info"]["year"]}"),
+        html.P(f"User: {stats["info"]['display_name']}"),
+        html.P(f"{stats["stats"]['yearly_movie_count']} Movies"),
+        html.P(f"{stats["stats"]['yearly_review']} Reviews"),
+        html.P(f"{stats["stats"]['yearly_like']} Likes"),
+        html.P(f"{round(stats["stats"]['yearly_minutes_watched'], 1)} Hours"),
     ])
