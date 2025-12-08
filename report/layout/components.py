@@ -21,5 +21,5 @@ def header_component(stats: dict):
         html.P(f"{stats["stats"]['yearly_movie_count']} Movies"),
         html.P(f"{stats["stats"]['yearly_review']} Reviews"),
         html.P(f"{stats["stats"]['yearly_like']} Likes"),
-        html.P(f"{round(stats["stats"]['yearly_minutes_watched'], 1)} Hours"),
+        html.P(f"{round((stats["stats"]['yearly_minutes_watched']/60), 1)} Hours"),
     ])
