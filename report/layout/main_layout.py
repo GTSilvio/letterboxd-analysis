@@ -28,6 +28,10 @@ def create_layout(stats: dict):
 
         html.H2("Your Dashboard"),
 
-        dcc.Graph(id="rating-distribution"),
-        html.Div(id="rating-table-output"),  # Table updates when chart clicked
+        style={
+            "backgroundColor": "#2b2b2b",  # dark background
+            "color": "white"}
+
+        #dcc.Graph(id="rating-distribution"),
+        #html.Div(id="rating-table-output"),  # Table updates when chart clicked
     ])
