@@ -7,16 +7,6 @@ def create_layout(stats: dict):
         [
             header_component(stats),
 
-            html.H2(
-                "Your Dashboard",
-                style={
-                    "textAlign": "center",
-                    "marginTop": "40px",
-                    "fontSize": "32px",
-                    "fontWeight": "bold"
-                }
-            ),
-
             # You can add more components below
             # dcc.Graph(id="rating-distribution"),
             # html.Div(id="rating-table-output"),
@@ -25,7 +15,7 @@ def create_layout(stats: dict):
         style={
             "backgroundColor": "#2b2b2b", 
             "minHeight": "100vh",
-            "display": "flex",
+            #"display": "flex",
             "flexDirection": "column",     # << important
             "alignItems": "center",        # center content horizontally
             "color": "white",
