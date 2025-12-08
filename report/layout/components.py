@@ -12,9 +12,9 @@ def header_component(stats: dict):
 
             html.P(
                 f"{stats['stats']['yearly_movie_count']} Movies\t"
-                f"{stats['stats']['yearly_review']} Reviews\t"
-                f"{stats['stats']['yearly_like']} Likes\t"
-                f"{round((stats['stats']['yearly_minutes_watched']/60), 1)} Hours",
+                f"\t{stats['stats']['yearly_review']} Reviews\t"
+                f"\t{stats['stats']['yearly_like']} Likes\t"
+                f"\t{round((stats['stats']['yearly_minutes_watched']/60), 1)} Hours",
                 style={"textAlign": "center"}
                    )
 
