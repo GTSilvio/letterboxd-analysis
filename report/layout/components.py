@@ -11,10 +11,11 @@ def header_component(stats: dict):
             html.P(f"User: {stats['info']['display_name']}", style={"fontSize": "18px", "textAlign": "center"}),
 
             html.P(
-                f"{stats['stats']['yearly_movie_count']} Movies"
-                f"{stats['stats']['yearly_review']} Reviews"
-                f"{stats['stats']['yearly_like']} Likes"
-                f"{round((stats['stats']['yearly_minutes_watched']/60), 1)} Hours"
+                f"{stats['stats']['yearly_movie_count']} Movies\t"
+                f"{stats['stats']['yearly_review']} Reviews\t"
+                f"{stats['stats']['yearly_like']} Likes\t"
+                f"{round((stats['stats']['yearly_minutes_watched']/60), 1)} Hours",
+                style={"textAlign": "center"}
                    )
 
             
