@@ -42,11 +42,11 @@ diary_data = load_diary(
 
 # Create Dash app
 app = Dash(__name__)
-app.layout = create_layout(stats)
+app.layout = create_layout()
 
 # Register callbacks
 register_chart_callbacks(app, stats, diary_data)
-register_interaction_callbacks(app, stats)
+register_interaction_callbacks(app, stats, diary_data)
 
 # Expose server for Render / Gunicorn
 server = app.server

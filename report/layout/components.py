@@ -1,4 +1,4 @@
-from dash import dcc, html, callback
+from dash import dcc, html, Input, Output
 import os
 from pathlib import Path
 
@@ -49,28 +49,32 @@ def stat_box(number, label):
 def user_selection():
     available_users = get_available_users()
     
-    controls = html.Div(
-    [
-        dcc.Dropdown(
-            id="user-dropdown",
-            options=[{"label": u, "value": u} for u in available_users],
-            value=available_users[0],  # default selection
-            clearable=False,
-        ),
+    return html.Div(
+        [
+            dcc.Dropdown(
+                id="user-dropdown",
+                options=[{"label": u, "value": u} for u in available_users],
+                value=available_users[0],
+                clearable=False,
+            ),
 
-        dcc.RadioItems(
-            id="movie-filter",
-            options=[
-                {"label": "All", "value": "all"},
-                {"label": "Full Movies Only", "value": "full"},
-            ],
-            value="all",
-            labelStyle={"display": "inline-block", "marginRight": "15px"},
-        ),
-    ],
-    style={"marginBottom": "20px"}
-)
-    return controls
+            dcc.RadioItems(
+                id="movie-filter",
+                options=[
+                    {"label": "All", "value": "all"},
+                    {"label": "Full Movies Only", "value": "full"},
+                ],
+                value="all",
+                labelStyle={
+                    "display": "inline-block",
+                    "marginRight": "15px",
+                    "color": "white",
+                },
+            ),
+        ],
+        style={"marginBottom": "20px"}
+    )
+
     
 def header_component(stats: dict):
 
