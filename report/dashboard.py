@@ -3,7 +3,7 @@
 import os
 from pathlib import Path
 from dash import Dash
-from report.data_loader import load_stats
+from report.data_loader import load_stats, load_diary
 from report.layout.main_layout import create_layout
 from report.callbacks.charts import register_chart_callbacks
 from report.callbacks.interactions import register_interaction_callbacks
@@ -33,12 +33,19 @@ stats = load_stats(
     year=YEAR
 )
 
+# Load diary data JSON
+diary_data = load_diary(
+    cache_dir=str(CACHE_DIR),
+    profile=USER,
+    year=YEAR
+)
+
 # Create Dash app
 app = Dash(__name__)
 app.layout = create_layout(stats)
 
 # Register callbacks
-register_chart_callbacks(app, stats)
+register_chart_callbacks(app, stats, diary_data)
 register_interaction_callbacks(app, stats)
 
 # Expose server for Render / Gunicorn

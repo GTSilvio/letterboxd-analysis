@@ -16,33 +16,7 @@ def load_stats(
     profile: Optional[str] = None,
     year: Optional[int] = None,
 ) -> dict:
-    """Load the stats JSON.
-
-    Behavior:
-    - If `stats_path` is provided, it's resolved relative to this file and loaded.
-    - Otherwise the function searches the `cache_dir` (relative to the package)
-      for files matching `*_stats.json`.
-    - If `profile` is provided the search is scoped to `cache/<profile>/` and if
-      `year` is also provided it will prefer the exact file
-      `<profile>/<year>/<profile>_<year>_stats.json`.
-
-    Parameters
-    ----------
-    stats_path : Optional[str]
-        Explicit path to the stats JSON (relative to this module). If given,
-        this path is used directly.
-    cache_dir : str
-        Relative path to the cache directory (default: `../cache`).
-    profile : Optional[str]
-        Optional profile (user) name to scope the search.
-    year : Optional[int]
-        Optional year to further scope the search when `profile` is provided.
-
-    Returns
-    -------
-    dict
-        Parsed statistics.
-    """
+    
     base = Path(__file__).resolve().parent
 
     if stats_path:
@@ -84,6 +58,59 @@ def load_stats(
             stats_file = max(matches, key=lambda p: p.stat().st_mtime)
 
     with open(stats_file, "r", encoding="utf-8") as f:
+        data = json.load(f)
+
+    return data
+
+
+def load_diary(
+    diary_path: Optional[str] = None,
+    cache_dir: str = "../cache",
+    profile: Optional[str] = None,
+    year: Optional[int] = None,
+) -> dict:
+    
+    base = Path(__file__).resolve().parent
+
+    if diary_path:
+        diary_file = base / diary_path
+        if not diary_file.exists():
+            raise FileNotFoundError(f"Specified diary_path not found: {diary_file}")
+    else:
+        cache_base = base / cache_dir
+        if not cache_base.exists():
+            raise FileNotFoundError(f"Cache directory not found: {cache_base}")
+
+        # If profile+year specified, prefer the well-known filename layout
+        if profile:
+            if year:
+                candidate = cache_base / profile / str(year) / f"diary_data_{profile}_{year}.json"
+                if candidate.exists():
+                    diary_file = candidate
+                else:
+                    raise FileNotFoundError(
+                        f"No diary file for profile='{profile}' year={year} at {candidate}"
+                    )
+            else:
+                profile_dir = cache_base / profile
+                if not profile_dir.exists():
+                    raise FileNotFoundError(f"Profile cache directory not found: {profile_dir}")
+
+                matches = list(profile_dir.rglob(f"diary_data_{profile}_*.json"))
+                if not matches:
+                    raise FileNotFoundError(f"No diary files found for profile: {profile}")
+
+                diary_file = max(matches, key=lambda p: p.stat().st_mtime)
+        else:
+            # No profile specified: search the whole cache for any diary_data_*.json
+            matches = list(cache_base.rglob("diary_data_*.json"))
+            if not matches:
+                raise FileNotFoundError(f"No diary files found under cache: {cache_base}")
+
+            # If more than one, pick the most recently modified
+            diary_file = max(matches, key=lambda p: p.stat().st_mtime)
+
+    with open(diary_file, "r", encoding="utf-8") as f:
         data = json.load(f)
 
     return data
