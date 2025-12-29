@@ -121,7 +121,7 @@ def create_monthly_distribution(diary_data):
             go.Bar(
                 x=all_months,
                 y=counts,
-                marker_color='#357f4e',  # Blue bars
+                marker_color="#717171", #'#357f4e',
                 hovertemplate="<b>%{x}</b><br>Movies: %{y}<extra></extra>",
             )
         ]
@@ -129,13 +129,15 @@ def create_monthly_distribution(diary_data):
 
     fig.update_layout(
         title="Movies Watched Per Month",
-        xaxis_title="Month",
-        yaxis_title="Count",
+        xaxis_title="",#"Month",
+        yaxis_title="", #"Count",
         showlegend=False,
         bargap=0,
         plot_bgcolor='rgba(0,0,0,0)',  # Transparent plot background
         paper_bgcolor='rgba(0,0,0,0)',  # Transparent paper background
-        font_color='white',  # White text for dark backgrounds
+        font_color='white',  # White text for dark backgrounds        
+        xaxis=dict(showticklabels=False),  # Hide x-axis labels    
+        yaxis=dict(showticklabels=False, showgrid=False),  # Hide y-axis numbers and grid
     )
 
     return fig
@@ -155,7 +157,7 @@ def create_ratings_distribution(diary_data):
         # Still show all rating bins even with no data
         all_ratings = list(range(1, 11))
         counts = [0] * 10
-        display_labels = ['⯨','★','★⯨','★★','★★⯨','★★★','★★★⯨','★★★★','★★★★⯨','★★★★★','★★★★★']
+        display_labels = ['⯨','★','★⯨','★★','★★⯨','★★★','★★★⯨','★★★★','★★★★⯨','★★★★★']
     else:
         # Count occurrences of each rating
         rating_counts = {}
@@ -165,14 +167,14 @@ def create_ratings_distribution(diary_data):
         # All possible ratings 1-10
         all_ratings = list(range(1, 11))
         counts = [rating_counts.get(r, 0) for r in all_ratings]
-        display_labels = ['⯨','★','★⯨','★★','★★⯨','★★★','★★★⯨','★★★★','★★★★⯨','★★★★★','★★★★★']
+        display_labels = ['⯨','★','★⯨','★★','★★⯨','★★★','★★★⯨','★★★★','★★★★⯨','★★★★★']
 
     fig = go.Figure(
         data=[
             go.Bar(
                 x=all_ratings,
                 y=counts,
-                marker_color='#357f4e',  # Orange bars
+                marker_color="#717171", #'#357f4e',
                 hovertemplate="<b>Rating %{x}</b><br>Movies: %{y}<extra></extra>",
             )
         ]
@@ -180,18 +182,15 @@ def create_ratings_distribution(diary_data):
 
     fig.update_layout(
         title="Rating Distribution",
-        xaxis_title="Rating",
-        yaxis_title="Count",
+        xaxis_title="", #"Rating",
+        yaxis_title="", #"Count",
         showlegend=False,
         bargap=0,
         plot_bgcolor='rgba(0,0,0,0)',  # Transparent plot background
         paper_bgcolor='rgba(0,0,0,0)',  # Transparent paper background
         font_color='white',  # White text for dark backgrounds
-        xaxis=dict(
-            tickmode='array',
-            tickvals=all_ratings,
-            ticktext=display_labels,  # Show stars on x-axis
-        ),
+        xaxis=dict(showticklabels=False),  # Hide x-axis labels
+        yaxis=dict(showticklabels=False, showgrid=False),  # Hide y-axis numbers and grid
     )
 
     return fig
