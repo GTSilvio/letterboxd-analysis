@@ -27,7 +27,7 @@ if __name__ == "__main__":
 
     """
     To Run Type ctrl + `
-    Then paste: python main.py --user gsilvio --year 2025 --trace --report --force-refresh
+    Then paste: python main.py --user spookusweenie --year 2025 --trace --force-refresh --report
     --user:          is required;       type in your python username
     --year:          is not required;   will default to 2025
     --force-refresh: is not requred;    just will update the saved data
@@ -37,4 +37,6 @@ if __name__ == "__main__":
     Usernames:
     gsilvio
     paytonnriley
+    spookusweenie
+    bonnegarcons
     """
