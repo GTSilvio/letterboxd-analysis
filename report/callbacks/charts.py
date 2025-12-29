@@ -136,6 +136,7 @@ def create_monthly_distribution(diary_data):
         plot_bgcolor='rgba(0,0,0,0)',  # Transparent plot background
         paper_bgcolor='rgba(0,0,0,0)',  # Transparent paper background
         font_color='white',  # White text for dark backgrounds
+        displayModeBar=False,  # Hide the toolbar
     )
 
     return fig
@@ -192,6 +193,7 @@ def create_ratings_distribution(diary_data):
             tickvals=all_ratings,
             ticktext=display_labels,  # Show stars on x-axis
         ),
+        displayModeBar=False,  # Hide the toolbar
     )
 
     return fig
