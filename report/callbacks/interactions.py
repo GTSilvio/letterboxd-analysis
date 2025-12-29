@@ -2,6 +2,7 @@ from dash import Input, Output, dash_table
 from report.data_loader import load_stats, load_diary
 from report.layout.components import header_component
 from pathlib import Path
+from report.callbacks.charts import create_monthly_distribution, create_ratings_distribution
 
 """
 interactions.py
@@ -59,5 +60,11 @@ def register_interaction_callbacks(app, stats, diary_data):
             profile=selected_user,
             year=2025,
         )
+
+        diary = load_diary(
+            cache_dir=str(CACHE_DIR),
+            profile=selected_user,
+            year=2025,
+            )
 
         return header_component(stats)

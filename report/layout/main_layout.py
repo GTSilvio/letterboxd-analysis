@@ -1,5 +1,5 @@
 from dash import html, dcc
-from .components import header_component, user_selection
+from .components import header_component, user_selection, monthly_movies_chart, ratings_distribution_chart
 
 def create_layout():
 
@@ -7,11 +7,17 @@ def create_layout():
         [
             user_selection(),
 
-            # Stores selected user globally
+            #Stores selected user globally
             dcc.Store(id="selected-user"),
 
-            # This is where the header will be injected
+            #This is where the header will be injected
             html.Div(id="header-container"),
+
+            #Ratings distribution chart
+            dcc.Graph(id="rating-distribution"),
+
+            #Ratings Chart
+            dcc.Graph(id="ratings-chart")
         ],
 
         style={

@@ -129,3 +129,29 @@ def highest_rated_films(stats: dict):
     )
 """
 
+
+
+def ratings_distribution_chart():
+    """Component for the ratings distribution histogram."""
+    return html.Div([
+        html.H2("Movie Ratings Distribution", style={"textAlign": "center", "marginBottom": "20px"}),
+        dcc.Graph(id="ratings-chart"),
+    ])
+
+
+
+def monthly_movies_chart():
+    """Component for the clickable monthly movies histogram."""
+    return html.Div([
+        html.H2("Movies Watched by Month", style={"textAlign": "center", "marginBottom": "20px"}),
+        dcc.Graph(id="rating-distribution"),
+        html.Div(id="movies-list", style={
+            "marginTop": "20px", 
+            "padding": "10px",
+            "backgroundColor": "#2b2b2b",
+            "borderRadius": "5px",
+            "minHeight": "100px"
+        })
+    ])
+
+
