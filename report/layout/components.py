@@ -117,18 +117,6 @@ def header_component(stats: dict):
         }
     )
 
-"""
-def highest_rated_films(stats: dict):
-
-    return html.Div(
-        [
-            html.P(
-                f'{stats[]}'
-            )
-        ]
-    )
-"""
-
 
 
 def ratings_distribution_chart():
@@ -144,7 +132,14 @@ def monthly_movies_chart():
     """Component for the clickable monthly movies histogram."""
     return html.Div([
         html.H2("Movies Watched by Month", style={"textAlign": "center", "marginBottom": "20px"}),
-        dcc.Graph(id="rating-distribution"),
+        dcc.Graph(
+            id="rating-distribution",
+            config={
+                'displayModeBar': False,  # Hide toolbar
+                'scrollZoom': False,      # Disable scroll-to-zoom
+                'doubleClick': False      # Disable double-click zoom
+            }
+        ),
         html.Div(id="movies-list", style={
             "marginTop": "20px", 
             "padding": "10px",

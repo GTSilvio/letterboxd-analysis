@@ -14,10 +14,12 @@ def create_layout():
             html.Div(id="header-container"),
 
             #Ratings distribution chart
-            dcc.Graph(id="rating-distribution"),
+            dcc.Graph(id="rating-distribution",
+                      config={'displayModeBar': False}),
 
             #Ratings Chart
-            dcc.Graph(id="ratings-chart")
+            dcc.Graph(id="ratings-chart",
+                      config={'displayModeBar': False})
         ],
 
         style={
