@@ -20,7 +20,7 @@ Render-Ready Dashboard
 """
 
 # Read defaults from environment variables
-USER = os.getenv("LETTERBOXD_USER", "gsilvio")
+USER = os.getenv("LETTERBOXD_USER", "paytonnriley") #currently where I swap the user need to make this more dynamic
 YEAR = int(os.getenv("LETTERBOXD_YEAR", 2025))
 
 # Determine cache directory relative to this file

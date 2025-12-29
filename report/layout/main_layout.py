@@ -1,10 +1,11 @@
 from dash import html, dcc
-from .components import header_component
+from .components import header_component, user_selection
 
 def create_layout(stats: dict):
 
     return html.Div(
         [
+            user_selection(),
             header_component(stats),
 
             # You can add more components below

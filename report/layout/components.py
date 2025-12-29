@@ -1,6 +1,21 @@
-from dash import html
+from dash import dcc, html, callback
+import os
+from pathlib import Path
 
-from dash import html
+
+
+#----------------------------------------------------Helper-Functions----------------------------------------------------
+
+
+
+def get_available_users():
+    """Get list of available users from cache directory."""
+    cache_dir = Path(__file__).resolve().parent.parent.parent / "cache"
+    if cache_dir.exists():
+        return [d.name for d in cache_dir.iterdir() if d.is_dir()]
+    return ["gsilvio"]  # fallback if cache doesn't exist
+
+
 
 def stat_box(number, label):
     return html.Div(
@@ -25,6 +40,38 @@ def stat_box(number, label):
     )
 
 
+
+#----------------------------------------------------Layout-Functions----------------------------------------------------
+
+
+
+
+def user_selection():
+    available_users = get_available_users()
+    
+    controls = html.Div(
+    [
+        dcc.Dropdown(
+            id="user-dropdown",
+            options=[{"label": u, "value": u} for u in available_users],
+            value=available_users[0],  # default selection
+            clearable=False,
+        ),
+
+        dcc.RadioItems(
+            id="movie-filter",
+            options=[
+                {"label": "All", "value": "all"},
+                {"label": "Full Movies Only", "value": "full"},
+            ],
+            value="all",
+            labelStyle={"display": "inline-block", "marginRight": "15px"},
+        ),
+    ],
+    style={"marginBottom": "20px"}
+)
+    return controls
+    
 def header_component(stats: dict):
 
     return html.Div(
@@ -66,10 +113,15 @@ def header_component(stats: dict):
         }
     )
 
-
 """
-            html.P(f"{stats['stats']['yearly_movie_count']} Movies"),
-            html.P(f"{stats['stats']['yearly_review']} Reviews"),
-            html.P(f"{stats['stats']['yearly_like']} Likes"),
-            html.P(f"{round((stats['stats']['yearly_minutes_watched']/60), 1)} Hours"),
-            """
+def highest_rated_films(stats: dict):
+
+    return html.Div(
+        [
+            html.P(
+                f'{stats[]}'
+            )
+        ]
+    )
+"""
+
