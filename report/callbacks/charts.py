@@ -129,15 +129,15 @@ def create_monthly_distribution(diary_data):
 
     fig.update_layout(
         title="Movies Watched Per Month",
-        xaxis_title="",#"Month",
-        yaxis_title="", #"Count",
+        xaxis_title="Month",
+        yaxis_title="Count",
         showlegend=False,
         bargap=0,
         plot_bgcolor='rgba(0,0,0,0)',  # Transparent plot background
         paper_bgcolor='rgba(0,0,0,0)',  # Transparent paper background
         font_color='white',  # White text for dark backgrounds        
-        xaxis=dict(showticklabels=False),  # Hide x-axis labels    
-        yaxis=dict(showticklabels=False, showgrid=False),  # Hide y-axis numbers and grid
+        xaxis=dict(showticklabels=True),  # Hide x-axis labels    
+        yaxis=dict(showticklabels=True, showgrid=False),  # Hide y-axis numbers and grid
     )
 
     return fig
@@ -182,15 +182,15 @@ def create_ratings_distribution(diary_data):
 
     fig.update_layout(
         title="Rating Distribution",
-        xaxis_title="", #"Rating",
-        yaxis_title="", #"Count",
+        xaxis_title="Rating",
+        yaxis_title="Count",
         showlegend=False,
         bargap=0,
         plot_bgcolor='rgba(0,0,0,0)',  # Transparent plot background
         paper_bgcolor='rgba(0,0,0,0)',  # Transparent paper background
         font_color='white',  # White text for dark backgrounds
-        xaxis=dict(showticklabels=False),  # Hide x-axis labels
-        yaxis=dict(showticklabels=False, showgrid=False),  # Hide y-axis numbers and grid
+        xaxis=dict(showticklabels=True),  # Hide x-axis labels
+        yaxis=dict(showticklabels=True, showgrid=False),  # Hide y-axis numbers and grid
     )
 
     return fig

@@ -95,6 +95,7 @@ def header_component(stats: dict):
                 [
                     stat_box(stats['stats']['yearly_movie_count'], "Movies"),
                     stat_box(stats['stats']['yearly_review'], "Reviews"),
+                    stat_box(stats['stats']['yearly_rewatch'], "Rewatches"),
                     stat_box(stats['stats']['yearly_like'], "Likes"),
                     stat_box(round((stats['stats']['yearly_minutes_watched']/60), 1), "Hours"),
                 ],
@@ -103,7 +104,7 @@ def header_component(stats: dict):
                     "justifyContent": "space-around",
                     "textAlign": "center",
                     "marginTop": "20px",
-                    "padding": "10px 0",
+                    #"padding": "10px 0",
                 }
             )
         ],
