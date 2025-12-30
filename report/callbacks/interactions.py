@@ -1,6 +1,6 @@
 from dash import Input, Output, dash_table
 from report.data_loader import load_stats, load_diary
-from report.layout.components import header_component
+from report.layout.components import header_component, averge_movies_per_month
 from pathlib import Path
 from report.callbacks.charts import create_monthly_distribution, create_ratings_distribution
 
@@ -68,3 +68,26 @@ def register_interaction_callbacks(app, stats, diary_data):
             )
 
         return header_component(stats)
+    
+    @app.callback(
+        Output("average-per-month", "children"),
+        Input("user-dropdown", "value"),
+    )
+    def update_average_per_month(selected_user):
+        if not selected_user:
+            return "Select a user to begin"
+
+        stats = load_stats(
+            cache_dir=str(CACHE_DIR),
+            profile=selected_user,
+            year=2025,
+        )
+
+        diary = load_diary(
+            cache_dir=str(CACHE_DIR),
+            profile=selected_user,
+            year=2025,
+            )
+
+        return averge_movies_per_month(stats)
+    

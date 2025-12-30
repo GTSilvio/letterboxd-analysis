@@ -118,6 +118,36 @@ def header_component(stats: dict):
         }
     )
 
+def averge_movies_per_month(stats: dict):
+
+    return html.Div(
+        [
+            
+            # ---- NEW STAT BOX ROW ----
+            html.Div(
+                [
+                    stat_box(stats['stats']['yearly_movie_count'], "Movies Watched This Year"),
+                    stat_box(stats['stats']['average_count_monthly'], "Average per Month"),
+                    stat_box(stats['stats']['average_count_weekly'], "Average per Week"),
+                ],
+                style={
+                    "display": "flex",
+                    "justifyContent": "space-around",
+                    "textAlign": "center",
+                    "marginTop": "20px",
+                    #"padding": "10px 0",
+                }
+            )
+        ],
+        
+        style={
+            "backgroundColor": "#2b2b2b",
+            "color": "white",
+            "fontSize": "18px",
+            "padding": "20px",
+            "borderRadius": "8px",
+        }
+    )
 
 
 def ratings_distribution_chart():
