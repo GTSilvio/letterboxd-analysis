@@ -1,8 +1,8 @@
 from dash import Input, Output, dash_table
 from report.data_loader import load_stats, load_diary
-from report.layout.components import header_component, averge_movies_per_month
+from report.layout.components import header_component, averge_movies_per_month,demographic_charts
 from pathlib import Path
-from report.callbacks.charts import create_monthly_distribution, create_ratings_distribution
+from report.callbacks.charts import create_day_of_week, create_monthly_distribution, create_ratings_distribution
 
 """
 interactions.py
@@ -43,10 +43,27 @@ def register_interaction_callbacks(app, stats, diary_data):
             columns=[{"name": i, "id": i} for i in movies[0].keys()],
             data=movies
         )"""
+    
+    #------------------------------
+    #Hover interaction
+    #------------------------------
 
-    # ------------------------------
-    # USER DROPDOWN → HEADER UPDATE
-    # ------------------------------
+    #@app.callback(
+    #Output("average-per-day-of-week", "figure"),
+    #Input("average-per-day-of-week", "hoverData"),
+    #)
+    #def update_day_chart(hoverData):
+    #    hovered_index = None
+    #
+    #    if hoverData and "points" in hoverData:
+    #        hovered_index = hoverData["points"][0]["pointIndex"]
+    #
+    #    return create_day_of_week(stats, hovered_index)
+
+
+    #------------------------------
+    #USER DROPDOWN → HEADER UPDATE
+    #------------------------------
     @app.callback(
         Output("header-container", "children"),
         Input("user-dropdown", "value"),
@@ -91,3 +108,24 @@ def register_interaction_callbacks(app, stats, diary_data):
 
         return averge_movies_per_month(stats)
     
+    @app.callback(
+        Output("demographic-charts", "children"),
+        Input("user-dropdown", "value"),
+    )
+    def update_average_per_month(selected_user):
+        if not selected_user:
+            return "Select a user to begin"
+
+        stats = load_stats(
+            cache_dir=str(CACHE_DIR),
+            profile=selected_user,
+            year=2025,
+        )
+
+        diary = load_diary(
+            cache_dir=str(CACHE_DIR),
+            profile=selected_user,
+            year=2025,
+            )
+
+        return demographic_charts(stats)

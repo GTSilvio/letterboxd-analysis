@@ -1,7 +1,7 @@
 from dash import dcc, html, Input, Output
 import os
 from pathlib import Path
-
+from report.callbacks.charts import create_day_of_week, create_genre_chart, create_country_chart, create_language_chart
 
 
 #----------------------------------------------------Helper-Functions----------------------------------------------------
@@ -21,12 +21,12 @@ def stat_box(number, label):
     return html.Div(
         [
             html.Div(str(number), style={
-                "fontSize": "32px",      # bigger number
+                "fontSize": "48px",      # bigger number
                 "fontWeight": "bold",
                 "marginBottom": "5px",
             }),
             html.Div(label, style={
-                "fontSize": "16px",
+                "fontSize": "32px",
                 "opacity": 0.8,
             })
         ],
@@ -36,6 +36,25 @@ def stat_box(number, label):
             "alignItems": "center",
             "padding": "10px",
             "minWidth": "120px",
+        }
+    )
+
+def stat_chart(fig, label):
+    return html.Div(
+        [
+            dcc.Graph(
+                figure=fig,
+                config={"displayModeBar": False},
+                style={"height": "100%", "width": "100%"}
+            ),
+            html.Div(label, style={"fontSize": "24px", "opacity": 0.8}),
+        ],
+        style={
+            "display": "flex",
+            "flexDirection": "column",
+            "alignItems": "center",
+            "padding": "10px",
+            "minWidth": "200px",
         }
     )
 
@@ -87,7 +106,7 @@ def header_component(stats: dict):
 
             html.P(
                 f"{stats['info']['display_name']}'s Letterboxd Wrapped {stats['info']['year']}\n",
-                style={"fontSize": "18px", "textAlign": "center"}
+                style={"fontSize": "36px", "textAlign": "center"}
             ),
 
             # ---- NEW STAT BOX ROW ----
@@ -129,6 +148,8 @@ def averge_movies_per_month(stats: dict):
                     stat_box(stats['stats']['yearly_movie_count'], "Movies Watched This Year"),
                     stat_box(stats['stats']['average_count_monthly'], "Average per Month"),
                     stat_box(stats['stats']['average_count_weekly'], "Average per Week"),
+                    stat_chart(create_day_of_week(stats),""),
+
                 ],
                 style={
                     "display": "flex",
@@ -136,6 +157,34 @@ def averge_movies_per_month(stats: dict):
                     "textAlign": "center",
                     "marginTop": "20px",
                     #"padding": "10px 0",
+                }
+            )
+        ],
+        
+        style={
+            "backgroundColor": "#2b2b2b",
+            "color": "white",
+            "fontSize": "18px",
+            "padding": "20px",
+            "borderRadius": "8px",
+        }
+    )
+
+def demographic_charts(stats: dict):
+    return html.Div(
+        [
+            
+            # ---- NEW STAT BOX ROW ----
+            html.Div(
+                [
+                    stat_chart(create_genre_chart(stats), "Top Genres"),
+                    stat_chart(create_country_chart(stats), "Top Countries"),
+                    stat_chart(create_language_chart(stats), "Top Languages"),
+                ],
+                style={
+                    "display": "flex",
+                    "gap": "12px",
+                    "justifyContent": "space-between",
                 }
             )
         ],

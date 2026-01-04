@@ -4,6 +4,67 @@ from report.data_loader import load_stats, load_diary
 from pathlib import Path
 
 
+
+#--------------------------------------------------------------------------------------------------------------------------
+
+
+
+def create_horizontal_bar_chart(data_dict, title, max_items=10):
+    """
+    Generic horizontal bar chart for stats where values are LISTS of items.
+    """
+
+    if not data_dict:
+        return go.Figure()
+
+    # Convert values → counts
+    counted_items = {
+        key: len(value) if isinstance(value, (list, tuple, set)) else value
+        for key, value in data_dict.items()
+    }
+
+    # Sort and take top N
+    sorted_items = sorted(
+        counted_items.items(),
+        key=lambda x: x[1],
+        reverse=True
+    )[:max_items]
+
+    labels = [item[0] for item in sorted_items]
+    values = [item[1] for item in sorted_items]
+
+    fig = go.Figure(
+        data=[
+            go.Bar(
+                x=values,
+                y=labels,
+                orientation="h",
+                marker_color="#717171",
+                hovertemplate="%{y}: %{x}<extra></extra>",
+            )
+        ]
+    )
+
+    fig.update_layout(
+        height=250,
+        width=400,
+        margin=dict(l=100, r=10, t=10, b=10),
+        showlegend=False,
+        plot_bgcolor="rgba(0,0,0,0)",
+        paper_bgcolor="rgba(0,0,0,0)",
+        font=dict(color="white", size=16),
+        xaxis=dict(showgrid=False, zeroline=False, showticklabels=False),
+        yaxis=dict(showgrid=False, autorange="reversed"),
+    )
+
+    return fig
+
+
+
+#--------------------------------------------------------------------------------------------------------------------------
+
+
+
 """
 charts.py
 
@@ -244,7 +305,7 @@ def create_ratings_distribution(diary_data):
     fig = go.Figure(
         data=[
             go.Bar(
-                x=all_ratings,
+                x=display_labels,
                 y=counts,
                 marker_color="#717171", #'#357f4e',
                 hovertemplate="<b>Rating %{x}</b><br>Movies: %{y}<extra></extra>",
@@ -267,9 +328,12 @@ def create_ratings_distribution(diary_data):
 
     return fig
 
-def create_ratings_piechart(diary_data):
-    """Pie chart of movie ratings."""
+import plotly.graph_objects as go
 
+def create_ratings_piechart(diary_data):
+    """Create a pie chart showing movie ratings in descending star order."""
+
+    # Extract ratings from diary data
     ratings = [
         entry["actions"]["rating"]
         for month in diary_data.values()
@@ -277,50 +341,148 @@ def create_ratings_piechart(diary_data):
         if entry["actions"]["rating"] is not None
     ]
 
-    if not ratings:
-        # Still show all rating bins even with no data
-        all_ratings = list(range(1, 11))
-        counts = [0] * 10
-        display_labels = ['⯨','★','★⯨','★★','★★⯨','★★★','★★★⯨','★★★★','★★★★⯨','★★★★★']
-    else:
-        # Count occurrences of each rating
-        rating_counts = {}
-        for rating in ratings:
-            rating_counts[rating] = rating_counts.get(rating, 0) + 1
+    # Define star labels in ascending order (used for mapping)
+    star_labels = ['⯨','★','★⯨','★★','★★⯨','★★★','★★★⯨','★★★★','★★★★⯨','★★★★★']
+    rating_values = list(range(1, 11))
 
-        # All possible ratings 1-10
-        all_ratings = list(range(1, 11))
-        counts = [rating_counts.get(r, 0) for r in all_ratings]
-        display_labels = ['⯨','★','★⯨','★★','★★⯨','★★★','★★★⯨','★★★★','★★★★⯨','★★★★★']
+    # Count ratings
+    rating_counts = {r: 0 for r in rating_values}
+    for r in ratings:
+        rating_counts[r] += 1
 
-    # Filter out zero counts for cleaner pie chart
-    filtered_labels = [display_labels[i] for i, count in enumerate(counts) if count > 0]
-    filtered_counts = [count for count in counts if count > 0]
+    # Pair labels with counts
+    combined = list(zip(star_labels, rating_values))
+    counts = [rating_counts[r] for r in rating_values]
 
-    if not filtered_counts:
-        # If no ratings, show a single slice
-        filtered_labels = ['No Ratings']
+    # Remove zero-count ratings
+    filtered = [(label, count) for label, count in zip(star_labels, counts) if count > 0]
+
+    # Handle case where no ratings exist
+    if not filtered:
+        filtered_labels = ["No Ratings"]
         filtered_counts = [1]
+    else:
+        # Map stars to numeric values for sorting
+        star_to_value = {
+            '★★★★★': 5,
+            '★★★★⯨': 4.5,
+            '★★★★': 4,
+            '★★★⯨': 3.5,
+            '★★★': 3,
+            '★★⯨': 2.5,
+            '★★': 2,
+            '★⯨': 1.5,
+            '★': 1,
+            '⯨': 0.5,
+        }
+
+        # Sort descending by rating
+        filtered.sort(key=lambda x: star_to_value[x[0]], reverse=True)
+
+        filtered_labels = [x[0] for x in filtered]
+        filtered_counts = [x[1] for x in filtered]
 
     fig = go.Figure(
         data=[
             go.Pie(
                 labels=filtered_labels,
                 values=filtered_counts,
-                marker_colors=['#ff9999','#66b3ff','#99ff99','#ffcc99','#ff99cc','#99ccff','#ffff99','#cc99ff','#99ffff','#ffb366'],
-                hovertemplate="<b>%{label}</b><br>Movies: %{value}<extra></extra>",
-                textinfo='percent',
-                textfont_size=12,
+                sort=False,  # VERY IMPORTANT: preserves order
+                textinfo="percent",
+                hovertemplate="<b>%{label}</b><br>Movies: %{value}<br>%{percent}<extra></extra>",
+                marker=dict(
+                    colors=[
+                        '#3A606E', '#4D6E76', '#607B7D', '#718580',
+                        '#828E82', '#969E88', '#AAAE8E', '#C5C7B7',
+                        '#D3D4CC', '#E0E0E0'
+                    ]
+                )
             )
         ]
     )
 
     fig.update_layout(
-        title="Rating Pie Chart",
+        title="Rating Distribution",
         showlegend=True,
-        plot_bgcolor='rgba(0,0,0,0)',  # Transparent plot background
-        paper_bgcolor='rgba(0,0,0,0)',  # Transparent paper background
-        font_color='white',  # White text for dark backgrounds
+        legend=dict(
+            title="Ratings",
+            traceorder="normal",  # respect order in data
+            itemclick=False,
+            itemdoubleclick=False,
+        ),
+        plot_bgcolor="rgba(0,0,0,0)",
+        paper_bgcolor="rgba(0,0,0,0)",
+        font_color="white",
     )
 
     return fig
+
+def create_day_of_week(stats, hovered_index=None):
+    full_days = [
+        "Monday", "Tuesday", "Wednesday",
+        "Thursday", "Friday", "Saturday", "Sunday"
+    ]
+
+    short_labels = ["M", "T", "W", "T", "F", "S", "S"]
+
+    day_data = stats.get("stats", {}).get("days_of_the_week", {})
+    counts = [len(day_data.get(day, [])) for day in full_days]
+
+    # Color logic using index (robust)
+    colors = [
+        "#3A606E" if i == hovered_index else "#717171"
+        for i in range(len(full_days))
+    ]
+
+    fig = go.Figure(
+        go.Bar(
+            x=full_days,
+            y=counts,
+            text=short_labels,
+            textposition="inside",
+            insidetextanchor="start",
+            textfont=dict(size=12, color="white"),
+            marker_color=colors,
+            hovertemplate="%{x}: %{y}<extra></extra>",
+        )
+    )
+
+    fig.update_layout(
+        height=120,
+        width=300,
+        margin=dict(l=8, r=8, t=8, b=8),
+        showlegend=False,
+        plot_bgcolor="rgba(0,0,0,0)",
+        paper_bgcolor="rgba(0,0,0,0)",
+        font=dict(color="white", size=10),
+        bargap=0,
+        xaxis=dict(
+            showgrid=False,
+            showticklabels=False,
+            zeroline=False,
+        ),
+        yaxis=dict(
+            showgrid=False,
+            showticklabels=False,
+            zeroline=False,
+        ),
+    )
+
+    return fig
+
+def create_genre_chart(stats):
+    return create_horizontal_bar_chart(stats["stats"]["genres"],"Top Genres")
+
+
+def create_country_chart(stats):
+    return create_horizontal_bar_chart(
+        stats["stats"]["country"],
+        "Top Countries"
+    )
+
+
+def create_language_chart(stats):
+    return create_horizontal_bar_chart(
+        stats["stats"]["language"],
+        "Top Languages"
+    )

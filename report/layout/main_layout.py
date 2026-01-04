@@ -14,21 +14,22 @@ def create_layout():
             html.Div(id="header-container"),
 
             #Ratings distribution chart
-            dcc.Graph(id="ratings-chart",
-                      config={'displayModeBar': False}),
+            dcc.Graph(id="ratings-chart", config={'displayModeBar': False}),
 
             #Ratings distribution Pie Chart
             dcc.Graph(id="ratings-pie", config={'displayModeBar': False}),
 
             #Monthly movies watched
-            dcc.Graph(id="rating-distribution",
-                      config={'displayModeBar': False}),
+            dcc.Graph(id="rating-distribution", config={'displayModeBar': False}),
 
             #Weekly movies watched
             dcc.Graph(id="weekly-distribution", config={'displayModeBar': False}),
 
             #html stats showing average per month and week etc
-            html.Div(id="average-per-month")
+            html.Div(id="average-per-month"),
+
+            #
+            html.Div(id="demographic-charts")
 
         ],
 
