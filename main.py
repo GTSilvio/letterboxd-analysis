@@ -27,12 +27,13 @@ if __name__ == "__main__":
 
     """
     To Run Type ctrl + `
-    Then paste: python main.py --user bonnegarcons --year 2025 --trace --force-refresh --report
+    Then paste: python main.py --user gsilvio --year 2025 --trace --force-refresh --report
     --user:          is required;       type in your python username
     --year:          is not required;   will default to 2025
     --force-refresh: is not requred;    just will update the saved data
     --summary-only:  is not required;   skips detailed master list output
     --trace:         is not requred;    adds trace back allowing you to see how long things are taking
+    --report:        is not required;    opens the online report dashboard
     ★⯨
     Usernames:
     gsilvio

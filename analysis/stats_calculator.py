@@ -18,6 +18,7 @@ class StatsCalculator:
         self.user = user
         self.user_info = User(self.user)
         self.stats = {}
+        self.full_stats = {}
 
     def add_months(self, keys=all_months, default_value=0):
         return {key: default_value for key in keys}
@@ -43,7 +44,7 @@ class StatsCalculator:
             month_name = self.all_months[movie_data['date']['month'] - 1]
             monthly_counts[month_name] = monthly_counts.get(month_name, 0) + 1
 
-            if int(movie_data['runtime']) >= self.full_movie:
+            if movie_data['runtime'] != 'null' and int(movie_data['runtime']) >= self.full_movie:
                 month_name = self.all_months[movie_data['date']['month'] - 1]
                 full_monthly_counts[month_name] = full_monthly_counts.get(month_name, 0) + 1
 
@@ -67,24 +68,30 @@ class StatsCalculator:
 
         #Rewatches per month and total
         monthly_rewatch = {}
+        full_monthly_rewatch = {}
 
         #add all the months to the rewatches dictionary
         monthly_rewatch = self.add_months()
+        full_monthly_rewatch = self.add_months()
 
         #loop to rewatches all the rewatches in the master list
         for movie_num, movie_data in self.master_list.items():
             month_name = self.all_months[movie_data['date']['month'] - 1]
             if movie_data['rewatched'] == True:
                 monthly_rewatch[month_name] = monthly_rewatch.get(month_name, 0) + 1
+
+                if movie_data['runtime'] != 'null' and int(movie_data['runtime']) >= self.full_movie:
+                    full_monthly_rewatch[month_name] = full_monthly_rewatch.get(month_name, 0) + 1
             else:
                 pass
 
         #sum the months to get yearly totals
         total_rewatch = sum(monthly_rewatch.values())
+        full_total_rewatch = sum(full_monthly_rewatch.values())
 
         #% Rewatches
         percent_rewatches = round((total_rewatch/yearly_count), 2)
-
+        full_percent_rewatches = round((full_total_rewatch/full_yearly_count), 2)
 
 
 
@@ -94,23 +101,30 @@ class StatsCalculator:
 
         #Reviewed per month and total
         monthly_review = {}
+        full_monthly_review = {}
 
         #add all the months to the reviews dictionary
         monthly_review = self.add_months()
+        full_monthly_review = self.add_months()
 
         #loop through to add all the reviews to dictionary
         for movie_num, movie_data in self.master_list.items():
             month_name = self.all_months[movie_data['date']['month'] - 1]
             if movie_data['reviewed'] == True:
                 monthly_review[month_name] = monthly_review.get(month_name, 0) + 1
+
+                if movie_data['runtime'] != 'null' and int(movie_data['runtime']) >= self.full_movie:
+                    full_monthly_review[month_name] = full_monthly_review.get(month_name, 0) + 1
             else:
                 pass
 
         #sum the months to get yearly totals
         total_review = sum(monthly_review.values())
+        full_total_review = sum(full_monthly_review.values())
 
         #percent reviewed
         percent_reviewed = round((total_review/yearly_count), 2)
+        full_percent_reviewed = round((full_total_review/full_yearly_count), 2)
 
 
 
@@ -120,24 +134,30 @@ class StatsCalculator:
 
         #Likes per month and total
         monthly_like = {}
-        total_like = 0
+        full_monthly_like = {}
 
         #add all the months to the monthly dictionary
         monthly_like = self.add_months()
+        full_monthly_like = self.add_months()
 
         #loop through to add all the likes to dictionary
         for movie_num, movie_data in self.master_list.items():
             month_name = self.all_months[movie_data['date']['month'] - 1]
             if movie_data['liked'] == True:
                 monthly_like[month_name] = monthly_like.get(month_name, 0) + 1
+
+                if movie_data['runtime'] != 'null' and int(movie_data['runtime']) >= self.full_movie:
+                    full_monthly_like[month_name] = full_monthly_like.get(month_name, 0) + 1
             else:
                 pass
 
         #sum the months to get yearly totals
         total_like = sum(monthly_like.values())
+        full_total_like = sum(full_monthly_like.values())
 
         #percent liked
         percent_liked = round( (total_like/yearly_count) ,2)
+        full_percent_liked = round( (full_total_like/full_yearly_count) ,2)
 
 
         #---------------------------------------Ratings---------------------------------------
@@ -146,6 +166,7 @@ class StatsCalculator:
 
         #Ratings distribution year (1-10)
         yearly_rating_count = {float(i/2): 0 for i in range(1, 11)}
+        full_yearly_rating_count = {float(i/2): 0 for i in range(1, 11)}
         monthly_rating_count = {}
 
         #Rating distribution for each month
@@ -177,6 +198,25 @@ class StatsCalculator:
         monthly_avg = {m: average_from_counts(c) for m, c in monthly_rating_count.items()}
         yearly_avg = average_from_counts(yearly_rating_count)
 
+        #Full ratings
+        full_monthly_rating_count = {}
+        for month_num in self.all_months:
+            full_monthly_rating_count[month_num] = {float(i/2): 0 for i in range(1, 11)}
+        
+        for movie_num, movie_data in self.master_list.items():
+            if movie_data['runtime'] != 'null' and int(movie_data['runtime']) >= self.full_movie:
+                month_name = self.all_months[movie_data['date']['month'] - 1]
+                if movie_data['rating'] != "null" and movie_data['rating'] != None:
+                    rating = float(movie_data['rating'])
+                    full_monthly_rating_count[month_name][rating] += 1
+
+        for month in full_monthly_rating_count:
+            for rating in full_yearly_rating_count:
+                full_yearly_rating_count[rating] += full_monthly_rating_count[month][rating]
+
+        full_monthly_avg = {m: average_from_counts(c) for m, c in full_monthly_rating_count.items()}
+        full_yearly_avg = average_from_counts(full_yearly_rating_count)
+
 
 
         #---------------------------------------Watch-Time---------------------------------------
@@ -185,28 +225,39 @@ class StatsCalculator:
 
         #establish varaibles yearly
         yearly_watch_hours = 0
+        full_yearly_watch_hours = 0
         average_movie_legnth_y = 0
+        full_average_movie_legnth_y = 0
 
         #establish variables monthly
         monthly_watch_hours = {}
+        full_monthly_watch_hours = {}
         average_movie_legnth_m = {}
+        full_average_movie_legnth_m = {}
 
         #add all the months to the watch time dictionary
         monthly_watch_hours = self.add_months()
+        full_monthly_watch_hours = self.add_months()
         average_movie_legnth_m = self.add_months()
+        full_average_movie_legnth_m = self.add_months()
 
         for movie_num, movie_data in self.master_list.items():
             month_name = self.all_months[movie_data['date']['month'] - 1]
             if movie_data['runtime'] != 'null':
                 monthly_watch_hours[month_name] += int(movie_data['runtime'])
+                if int(movie_data['runtime']) >= self.full_movie:
+                    full_monthly_watch_hours[month_name] += int(movie_data['runtime'])
 
         for month in monthly_watch_hours:
             average_movie_legnth_m[month] = round(((monthly_watch_hours[month] / monthly_counts[month]) if monthly_counts[month] != 0 else 0), 1)
+            full_average_movie_legnth_m[month] = round(((full_monthly_watch_hours[month] / full_monthly_counts[month]) if full_monthly_counts[month] != 0 else 0), 1)
 
         for month in monthly_watch_hours:
             yearly_watch_hours += monthly_watch_hours[month]
+            full_yearly_watch_hours += full_monthly_watch_hours[month]
 
         average_movie_legnth_y = round(((yearly_watch_hours / yearly_count) if yearly_count != 0 else 0), 1)
+        full_average_movie_legnth_y = round(((full_yearly_watch_hours / full_yearly_count) if full_yearly_count != 0 else 0), 1)
 
 
 
@@ -216,7 +267,7 @@ class StatsCalculator:
         
         #X movie watched
         x_movie_watched = {}
-   
+        full_x_movie_watched = {}
 
         x_movie_watched['1'] = self.master_list['1']['name']
 
@@ -226,6 +277,17 @@ class StatsCalculator:
                 x_movie_watched[movie_num] = movie_data['name']
 
         x_movie_watched['last'] = self.master_list[str(len(self.master_list))]['name']
+
+        # For full, filter master_list to full movies, then pick same logic
+        full_master_list = {k: v for k, v in self.master_list.items() if v['runtime'] != 'null' and int(v['runtime']) >= self.full_movie}
+        if full_master_list:
+            full_x_movie_watched['1'] = full_master_list['1']['name'] if '1' in full_master_list else None
+            for movie_num in full_master_list:
+                if int(movie_num) % 25 == 0:
+                    full_x_movie_watched[movie_num] = full_master_list[movie_num]['name']
+            last_key = str(len(full_master_list))
+            if last_key in full_master_list:
+                full_x_movie_watched['last'] = full_master_list[last_key]['name']
         
             
 
@@ -235,16 +297,27 @@ class StatsCalculator:
 
         #Top Rated Movies
         Top_movies = {}
+        full_Top_movies = {}
         highestrating = 0
+        full_highestrating = 0
 
         for movie_num, movie_data in self.master_list.items():
-            if movie_data['rating'] != 'null' and movie_data['rating'] != None:
+            if 'rating' in movie_data and movie_data['rating'] != 'null' and movie_data['rating'] != None:
                 if movie_data['rating'] > highestrating:
                     highestrating = movie_data['rating']
         
         for movie_num, movie_data in self.master_list.items():
-            if movie_data['rating'] != 'null' and movie_data['rating'] != None and movie_data['rating'] == highestrating:
+            if 'rating' in movie_data and movie_data['rating'] != 'null' and movie_data['rating'] != None and movie_data['rating'] == highestrating:
                 Top_movies[movie_num] = movie_data['name']
+
+        for movie_num, movie_data in self.master_list.items():
+            if movie_data['runtime'] != 'null' and int(movie_data['runtime']) >= self.full_movie and 'rating' in movie_data and movie_data['rating'] != 'null' and movie_data['rating'] != None:
+                if movie_data['rating'] > full_highestrating:
+                    full_highestrating = movie_data['rating']
+        
+        for movie_num, movie_data in self.master_list.items():
+            if int(movie_data['runtime']) >= self.full_movie and 'rating' in movie_data and movie_data['rating'] != 'null' and movie_data['rating'] != None and movie_data['rating'] == full_highestrating:
+                full_Top_movies[movie_num] = movie_data['name']
 
 
 
@@ -254,11 +327,27 @@ class StatsCalculator:
 
         #Top Actor
         top_actor = {}
+        full_top_actor = {}
 
         self.cast_list = dict(sorted(self.cast_list.items(), key=lambda x: x[1]["appearances"], reverse=True))
 
         for actor_slug, actor_data in list(self.cast_list.items())[:10]:
             top_actor[actor_data['name']] = actor_data['appearances']
+
+        # For full, rebuild cast_list with only full movies
+        full_cast_list = {}
+        for movie_num, movie_data in self.master_list.items():
+            if movie_data['runtime'] != 'null' and int(movie_data['runtime']) >= self.full_movie:
+                if 'cast' in movie_data and movie_data['cast'] != []:
+                    for actor in movie_data['cast']:
+                        if actor not in full_cast_list:
+                            full_cast_list[actor] = {"name": actor, "appearances": 0}
+                        full_cast_list[actor]["appearances"] += 1
+
+        full_cast_list = dict(sorted(full_cast_list.items(), key=lambda x: x[1]["appearances"], reverse=True))
+
+        for actor_slug, actor_data in list(full_cast_list.items())[:10]:
+            full_top_actor[actor_data['name']] = actor_data['appearances']
 
 
 
@@ -268,11 +357,27 @@ class StatsCalculator:
 
         #Top Director
         top_director = {}
+        full_top_director = {}
 
         self.director_list = dict(sorted(self.director_list.items(), key=lambda x: x[1]["appearances"], reverse=True))
 
         for director_slug, director_data in list(self.director_list.items())[:10]:
             top_director[director_data['name']] = director_data['appearances']
+
+        # For full, rebuild director_list with only full movies
+        full_director_list = {}
+        for movie_num, movie_data in self.master_list.items():
+            if movie_data['runtime'] != 'null' and int(movie_data['runtime']) >= self.full_movie:
+                if 'directors' in movie_data and movie_data['directors'] != []:
+                    for director in movie_data['directors']:
+                        if director not in full_director_list:
+                            full_director_list[director] = {"name": director, "appearances": 0}
+                        full_director_list[director]["appearances"] += 1
+
+        full_director_list = dict(sorted(full_director_list.items(), key=lambda x: x[1]["appearances"], reverse=True))
+
+        for director_slug, director_data in list(full_director_list.items())[:10]:
+            full_top_director[director_data['name']] = director_data['appearances']
 
         
         
@@ -302,9 +407,11 @@ class StatsCalculator:
 
         #Create a dictionary to store movies per week
         weekly_movies = {}
+        full_weekly_movies = {}
 
         for num in range(52):
             weekly_movies[f'week {num+1}'] = []
+            full_weekly_movies[f'week {num+1}'] = []
 
         #Loop through all movies
         for key, movie in self.master_list.items():
@@ -316,6 +423,8 @@ class StatsCalculator:
 
             #Add movie key to the corresponding week
             weekly_movies[f"week {week_number}"].append(str(key))
+            if movie_data['runtime'] != 'null' and int(movie_data['runtime']) >= self.full_movie:
+                full_weekly_movies[f"week {week_number}"].append(str(key))
 
 
 
@@ -325,6 +434,7 @@ class StatsCalculator:
 
         # Create a dictionary to store movies per day
         daily_movies = {}
+        full_daily_movies = {}
 
         # Determine if the year is a leap year
         # You should base this on the movies you're processing — for example the earliest movie:
@@ -335,6 +445,7 @@ class StatsCalculator:
         # Create the correct number of days
         for num in range(days_in_year):
             daily_movies[f'day {num+1}'] = []
+            full_daily_movies[f'day {num+1}'] = []
 
         # Loop through all movies
         for key, movie in self.master_list.items():
@@ -346,6 +457,8 @@ class StatsCalculator:
 
             # Add movie key to the corresponding day
             daily_movies[f'day {day_number}'].append(str(key))
+            if movie_data['runtime'] != 'null' and int(movie_data['runtime']) >= self.full_movie:
+                full_daily_movies[f'day {day_number}'].append(str(key))
 
 
 
@@ -357,6 +470,7 @@ class StatsCalculator:
 
         #Create a dictionary to store movies per day of the week
         days_of_the_week = {'Monday': [], "Tuesday": [], "Wednesday": [], "Thursday": [], "Friday": [], "Saturday": [], "Sunday": []}
+        full_days_of_the_week = {'Monday': [], "Tuesday": [], "Wednesday": [], "Thursday": [], "Friday": [], "Saturday": [], "Sunday": []}
 
         #loop through all movies
         for key, movie in self.master_list.items():
@@ -367,6 +481,8 @@ class StatsCalculator:
             weekday_name = days_of_week[movie_date.weekday()]
 
             days_of_the_week[weekday_name].append(str(key))
+            if movie_data['runtime'] != 'null' and int(movie_data['runtime']) >= self.full_movie:
+                full_days_of_the_week[weekday_name].append(str(key))
 
 
 
@@ -376,9 +492,10 @@ class StatsCalculator:
 
         #Genere Dictionary
         genre_dict = {}
+        full_genre_dict = {}
 
         for movie_num, movie_data in self.master_list.items():
-            if movie_data['genres'] != []:
+            if 'genres' in movie_data and movie_data['genres'] != []:
                 for genre in movie_data['genres']:
                     if genre not in genre_dict:
                         genre_dict[genre] = []
@@ -386,8 +503,16 @@ class StatsCalculator:
                     else:
                         genre_dict[genre].append(str(movie_num))
 
+                    if movie_data['runtime'] != 'null' and int(movie_data['runtime']) >= self.full_movie:
+                        if genre not in full_genre_dict:
+                            full_genre_dict[genre] = []
+                            full_genre_dict[genre].append(str(movie_num))
+                        else:
+                            full_genre_dict[genre].append(str(movie_num))
+
         #sort the dictionary by value
         genre_dict = dict(sorted(genre_dict.items(), key=lambda item: len(item[1]), reverse=True))
+        full_genre_dict = dict(sorted(full_genre_dict.items(), key=lambda item: len(item[1]), reverse=True))
 
 
 
@@ -397,9 +522,10 @@ class StatsCalculator:
 
         #country Dictionary
         country_dict = {}
+        full_country_dict = {}
 
         for movie_num, movie_data in self.master_list.items():
-            if movie_data['country'] != []:
+            if 'country' in movie_data and movie_data['country'] != []:
                 for country in movie_data['country']:
                     if country not in country_dict:
                         country_dict[country] = []
@@ -407,8 +533,16 @@ class StatsCalculator:
                     else:
                         country_dict[country].append(str(movie_num))
 
+                    if movie_data['runtime'] != 'null' and int(movie_data['runtime']) >= self.full_movie:
+                        if country not in full_country_dict:
+                            full_country_dict[country] = []
+                            full_country_dict[country].append(str(movie_num))
+                        else:
+                            full_country_dict[country].append(str(movie_num))
+
         #sort the dictionary by value
         country_dict = dict(sorted(country_dict.items(), key=lambda item: len(item[1]), reverse=True))
+        full_country_dict = dict(sorted(full_country_dict.items(), key=lambda item: len(item[1]), reverse=True))
 
 
 
@@ -418,9 +552,10 @@ class StatsCalculator:
 
         #language Dictionary
         language_dict = {}
+        full_language_dict = {}
 
         for movie_num, movie_data in self.master_list.items():
-            if movie_data['language'] != []:
+            if 'language' in movie_data and movie_data['language'] != []:
                 for language in movie_data['language']:
                     if language not in language_dict:
                         language_dict[language] = []
@@ -428,8 +563,16 @@ class StatsCalculator:
                     else:
                         language_dict[language].append(str(movie_num))
 
+                    if movie_data['runtime'] != 'null' and int(movie_data['runtime']) >= self.full_movie:
+                        if language not in full_language_dict:
+                            full_language_dict[language] = []
+                            full_language_dict[language].append(str(movie_num))
+                        else:
+                            full_language_dict[language].append(str(movie_num))
+
         #sort the dictionary by value
         language_dict = dict(sorted(language_dict.items(), key=lambda item: len(item[1]), reverse=True))
+        full_language_dict = dict(sorted(full_language_dict.items(), key=lambda item: len(item[1]), reverse=True))
 
         for language in language_dict:
             templist = []
@@ -437,6 +580,13 @@ class StatsCalculator:
                 if num not in templist:
                     templist.append(num)
             language_dict[language] = templist
+
+        for language in full_language_dict:
+            templist = []
+            for num in full_language_dict[language]:
+                if num not in templist:
+                    templist.append(num)
+            full_language_dict[language] = templist
                 
 
 
@@ -446,18 +596,27 @@ class StatsCalculator:
 
         #studios Dictionary
         studio_dict = {}
+        full_studio_dict = {}
 
         for movie_num, movie_data in self.master_list.items():
-            if movie_data['studio'] != []:
+            if 'studio' in movie_data and movie_data['studio'] != []:
                 for studio in movie_data['studio']:
                     if studio not in studio_dict:
                         studio_dict[studio] = []
                         studio_dict[studio].append(str(movie_num))
                     else:
                         studio_dict[studio].append(str(movie_num))
+                    
+                    if movie_data['runtime'] != 'null' and int(movie_data['runtime']) >= self.full_movie:
+                        if studio not in full_studio_dict:
+                            full_studio_dict[studio] = []
+                            full_studio_dict[studio].append(str(movie_num))
+                        else:
+                            full_studio_dict[studio].append(str(movie_num))
         
         #sort the dictionary by value
         studio_dict = dict(sorted(studio_dict.items(), key=lambda item: len(item[1]), reverse=True))
+        full_studio_dict = dict(sorted(full_studio_dict.items(), key=lambda item: len(item[1]), reverse=True))
 
 
 
@@ -485,17 +644,21 @@ class StatsCalculator:
         release_dict = {}
 
         for movie_num, movie_data in self.master_list.items():
-            if movie_data['released'] != []:
+            if 'released' in movie_data and movie_data['released'] != []:
                 release_dict[movie_num] = movie_data['released']
 
         #% in current year
         current_year_counter = 0
+        full_current_year_counter = 0
 
         for movie_num, release_year in release_dict.items():
             if release_year == self.year:
                 current_year_counter += 1
+                if self.master_list[movie_num]['runtime'] != 'null' and int(self.master_list[movie_num]['runtime']) >= self.full_movie:
+                    full_current_year_counter += 1
 
         percent_current_year = round((current_year_counter / yearly_count), 2)
+        full_percent_current_year = round((full_current_year_counter / full_yearly_count), 2)
 
 
 
@@ -506,12 +669,19 @@ class StatsCalculator:
         #Rarest Movie
         rarest = {}
         popular = {}
+        full_rarest = {}
+        full_popular = {}
 
         for movie_num, movie_data in self.master_list.items():
-            rarest[movie_num] = movie_data["popularity"]["members"]
+            if "popularity" in movie_data and "members" in movie_data["popularity"]:
+                rarest[movie_num] = movie_data["popularity"]["members"]
+                if movie_data['runtime'] != 'null' and int(movie_data['runtime']) >= self.full_movie:
+                    full_rarest[movie_num] = movie_data["popularity"]["members"]
 
         rarest = dict(sorted(rarest.items(), key=lambda item: int(item[1]), reverse=False))
         popular = dict(sorted(rarest.items(), key=lambda item: int(item[1]), reverse=True))
+        full_rarest = dict(sorted(full_rarest.items(), key=lambda item: int(item[1]), reverse=False))
+        full_popular = dict(sorted(full_rarest.items(), key=lambda item: int(item[1]), reverse=True))
 
 
 
@@ -539,7 +709,7 @@ class StatsCalculator:
         for day, day_list in daily_movies.items():
             num_today = 0
             for movie in day_list:
-                if int(self.master_list[movie]['runtime']) >= self.full_movie:
+                if self.master_list[movie]['runtime'] != 'null' and int(self.master_list[movie]['runtime']) >= self.full_movie:
                     num_today += 1
             
             if num_today > most_full_daily:
@@ -571,7 +741,7 @@ class StatsCalculator:
         for week, week_list in weekly_movies.items():
             num_weekly = 0
             for movie in week_list:
-                if int(self.master_list[movie]['runtime']) >= self.full_movie:
+                if self.master_list[movie]['runtime'] != 'null' and int(self.master_list[movie]['runtime']) >= self.full_movie:
                     num_weekly += 1
             
             if num_weekly > most_full_weekly:
@@ -673,16 +843,20 @@ class StatsCalculator:
             "avatar_info": self.user_info.avatar,
             "favorites": self.user_info.favorites
             }
+        
+        self.full_stats['info'] = {
+            "username": self.user,
+            "display_name": self.user_info.display_name,
+            "year": self.year,
+            "avatar_info": self.user_info.avatar,
+            "favorites": self.user_info.favorites
+            }
 
         self.stats['stats'] = {
             "monthly_movie_count": monthly_counts,
-            "full_monthly_movie_count": full_monthly_counts,
             "yearly_movie_count": yearly_count,
-            "full_yearly_movie_count": full_yearly_count,
             "average_count_monthly": average_count_monthly,
-            "full_average_count_monthly": full_average_count_monthly,
             "average_count_weekly": average_count_weekly,
-            "full_average_count_weekly": full_average_count_weekly,
             "monthly_rewatch": monthly_rewatch,
             "yearly_rewatch": total_rewatch,
             "percent_rewatches": percent_rewatches,
@@ -717,9 +891,53 @@ class StatsCalculator:
             "rarest_movies": rarest,
             "popular_movies": popular,
             "most_movies_daily": most_movies_daily,
-            "most_full_movies_daily": most_full_movies_daily,
             "most_movies_weekly": most_movies_weekly,
-            "most_full_movies_weekly": most_full_movies_weekly,
+            "consecutive_days": consecutive_days,
+            "longest_daily_streak": longest_daily_streak,
+            "consecutive_weeks": consecutive_weeks,
+            "longest_weekly_streak": longest_weekly_streak
+        }
+
+        self.full_stats['stats'] = {
+            "monthly_movie_count": full_monthly_counts,
+            "yearly_movie_count": full_yearly_count,
+            "average_count_monthly": full_average_count_monthly,
+            "average_count_weekly": full_average_count_weekly,
+            "monthly_rewatch": full_monthly_rewatch,
+            "yearly_rewatch": full_total_rewatch,
+            "percent_rewatches": full_percent_rewatches,
+            "monthly_review": full_monthly_review,
+            "yearly_review": full_total_review,
+            "percent_review": full_percent_reviewed,
+            "monthly_like": full_monthly_like,
+            "yearly_like": full_total_like,
+            "percent_liked": full_percent_liked,
+            "yearly_rating_count": full_yearly_rating_count,
+            "monthly_rating_count": full_monthly_rating_count,
+            "monthly_rating_average": full_monthly_avg,
+            "yearly_rating_average": full_yearly_avg,
+            "yearly_minutes_watched": full_yearly_watch_hours,
+            "yearly_average_legnth": full_average_movie_legnth_y,
+            "monthly_minutes_watched": full_monthly_watch_hours,
+            "average_minutes_watched_monthly": full_average_movie_legnth_m,
+            "X_movie_watched": full_x_movie_watched,
+            "top_movies": full_Top_movies,
+            "top_actors_10": full_top_actor,
+            "top_directors_10": full_top_director,
+            "multiwatches": multiwatches,
+            "num_per_week": full_weekly_movies,
+            "num_per_day": full_daily_movies,
+            "days_of_the_week": full_days_of_the_week,
+            "genres": full_genre_dict,
+            "country": full_country_dict,
+            "language": full_language_dict,
+            "studio": full_studio_dict,
+            "releases": release_dict,
+            "percent_current_years": full_percent_current_year,
+            "rarest_movies": full_rarest,
+            "popular_movies": full_popular,
+            "most_movies_daily": most_full_movies_daily,
+            "most_movies_weekly": most_full_movies_weekly,
             "consecutive_days": consecutive_days,
             "longest_daily_streak": longest_daily_streak,
             "consecutive_weeks": consecutive_weeks,

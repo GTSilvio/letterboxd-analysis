@@ -5,11 +5,12 @@ from utils.data_access import DataAccess
 class ReportPrinter:
     """Handles formatted output of results."""
 
-    def __init__(self, stats: dict, user: str, year: int, master_list: dict):
+    def __init__(self, stats: dict, user: str, year: int, master_list: dict, full_stats: dict = None):
         self.stats = stats or {}
         self.user = user
         self.year = year
         self.master_list = master_list or {}
+        self.full_stats = full_stats or {}
 
     def print_summary(self):
         """print(f"\n===== Letterboxd Summary for {self.user} ({self.year}) =====\n")
@@ -169,6 +170,8 @@ class ReportPrinter:
         # Export stats to JSON file for downstream use
         try:
             self.export_stats_json()
+            if self.full_stats:
+                self.export_full_stats_json()
         except Exception:
             # Defensive: don't crash the printer if saving fails
             pass
@@ -194,5 +197,28 @@ class ReportPrinter:
                 return saved_path
         except Exception as e:
             print(f"Error saving stats JSON to {filename}: {e}")
+            return None
+        
+    def export_full_stats_json(self, path: str | None = None):
+        """Write self.full_stats to the user's cache using DataAccess. If `path` is
+        provided it will be used as a literal filename (saved into cwd). Otherwise
+        we save into the cache directory under cache/<user>/<year>/<user>_<year>_full_stats.json.
+        Returns the saved path on success.
+        """
+        filename = path or f"{self.user}_{self.year}_full_stats.json"
+        try:
+            if path:
+                # Write directly to the provided path
+                with open(filename, "w", encoding="utf-8") as fh:
+                    json.dump(self.full_stats, fh, ensure_ascii=False, indent=2)
+                print(f"Saved full stats JSON to {filename}")
+                return filename
+            else:
+                da = DataAccess()
+                saved_path = da.save_json(self.user, self.year, filename, self.full_stats)
+                print(f"Saved full stats JSON to {saved_path}")
+                return saved_path
+        except Exception as e:
+            print(f"Error saving full stats JSON to {filename}: {e}")
             return None
         

@@ -99,38 +99,35 @@ def register_chart_callbacks(app, stats, diary_data):
 
     @app.callback(
         Output("rating-distribution", "figure"),
-        Input("user-dropdown", "value"),
+        [Input("user-dropdown", "value"), Input("year-dropdown", "value"), Input("movie-filter", "value")],
     )
-    def render_monthly_distribution(selected_user):
-        stats = load_stats(
-            cache_dir=str(CACHE_DIR),
-            profile=selected_user,
-            year=2025,
-        )
-
+    def render_monthly_distribution(selected_user, selected_year, movie_filter):
+        if not selected_user or not selected_year:
+            return {}
+        
+        full_stats = (movie_filter == "full")
         diary = load_diary(
             cache_dir=str(CACHE_DIR),
             profile=selected_user,
-            year=2025,
-            )
+            year=int(selected_year),
+        )
         return create_monthly_distribution(diary)
     
     @app.callback(
         Output("weekly-distribution", "figure"),
-        Input("user-dropdown", "value"),
+        [Input("user-dropdown", "value"), Input("year-dropdown", "value"), Input("movie-filter", "value")],
     )
-    def render_weekly_distribution(selected_user):
+    def render_weekly_distribution(selected_user, selected_year, movie_filter):
+        if not selected_user or not selected_year:
+            return {}
+        
+        full_stats = (movie_filter == "full")
         stats = load_stats(
             cache_dir=str(CACHE_DIR),
             profile=selected_user,
-            year=2025,
+            year=int(selected_year),
+            full_stats=full_stats,
         )
-
-        diary = load_diary(
-            cache_dir=str(CACHE_DIR),
-            profile=selected_user,
-            year=2025,
-            )
         return create_weekly_distribution(stats)
         
 
@@ -165,38 +162,32 @@ def register_chart_callbacks(app, stats, diary_data):
 
     @app.callback(
         Output("ratings-chart", "figure"),
-        Input("user-dropdown", "value"),
+        [Input("user-dropdown", "value"), Input("year-dropdown", "value"), Input("movie-filter", "value")],
     )
-    def render_ratings_distribution(selected_user):
-        stats = load_stats(
-            cache_dir=str(CACHE_DIR),
-            profile=selected_user,
-            year=2025,
-        )
-
+    def render_ratings_distribution(selected_user, selected_year, movie_filter):
+        if not selected_user or not selected_year:
+            return {}
+        
         diary = load_diary(
             cache_dir=str(CACHE_DIR),
             profile=selected_user,
-            year=2025,
-            )
+            year=int(selected_year),
+        )
         return create_ratings_distribution(diary)
     
     @app.callback(
         Output("ratings-pie", "figure"),
-        Input("user-dropdown", "value"),
+        [Input("user-dropdown", "value"), Input("year-dropdown", "value"), Input("movie-filter", "value")],
     )
-    def render_ratings_pie(selected_user):
-        stats = load_stats(
-            cache_dir=str(CACHE_DIR),
-            profile=selected_user,
-            year=2025,
-        )
-
+    def render_ratings_pie(selected_user, selected_year, movie_filter):
+        if not selected_user or not selected_year:
+            return {}
+        
         diary = load_diary(
             cache_dir=str(CACHE_DIR),
             profile=selected_user,
-            year=2025,
-            )
+            year=int(selected_year),
+        )
         return create_ratings_piechart(diary)
 
 

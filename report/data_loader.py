@@ -15,6 +15,7 @@ def load_stats(
     cache_dir: str = "../cache",
     profile: Optional[str] = None,
     year: Optional[int] = None,
+    full_stats: bool = False,
 ) -> dict:
     
     base = Path(__file__).resolve().parent
@@ -31,7 +32,8 @@ def load_stats(
         # If profile+year specified, prefer the well-known filename layout
         if profile:
             if year:
-                candidate = cache_base / profile / str(year) / f"{profile}_{year}_stats.json"
+                suffix = "_full_stats.json" if full_stats else "_stats.json"
+                candidate = cache_base / profile / str(year) / f"{profile}_{year}{suffix}"
                 if candidate.exists():
                     stats_file = candidate
                 else:
@@ -43,14 +45,16 @@ def load_stats(
                 if not profile_dir.exists():
                     raise FileNotFoundError(f"Profile cache directory not found: {profile_dir}")
 
-                matches = list(profile_dir.rglob(f"{profile}_*_stats.json"))
+                suffix = "*_full_stats.json" if full_stats else "*_stats.json"
+                matches = list(profile_dir.rglob(f"{profile}_{suffix}"))
                 if not matches:
                     raise FileNotFoundError(f"No stats files found for profile: {profile}")
 
                 stats_file = max(matches, key=lambda p: p.stat().st_mtime)
         else:
             # No profile specified: search the whole cache for any *_stats.json
-            matches = list(cache_base.rglob("*_stats.json"))
+            suffix = "*_full_stats.json" if full_stats else "*_stats.json"
+            matches = list(cache_base.rglob(suffix))
             if not matches:
                 raise FileNotFoundError(f"No stats files found under cache: {cache_base}")
 

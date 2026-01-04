@@ -21,8 +21,9 @@ class LetterboxdAnalysis:
 
         calculator = StatsCalculator(diary_data, master_list, cast_list, director_list, self.year, self.user)
         stats = calculator.compute()
+        full_stats = calculator.full_stats
 
-        printer = ReportPrinter(stats, self.user, self.year, master_list)
+        printer = ReportPrinter(stats, self.user, self.year, master_list, full_stats)
         printer.print_summary()
 
         """

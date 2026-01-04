@@ -15,6 +15,14 @@ def get_available_users():
         return [d.name for d in cache_dir.iterdir() if d.is_dir()]
     return ["gsilvio"]  # fallback if cache doesn't exist
 
+def get_available_years(user):
+    """Get list of available years for a specific user from cache directory."""
+    cache_dir = Path(__file__).resolve().parent.parent.parent / "cache" / user
+    if cache_dir.exists():
+        years = [d.name for d in cache_dir.iterdir() if d.is_dir()]
+        return sorted(years, reverse=True)  # Sort descending (newest first)
+    return []
+
 
 
 def stat_box(number, label):
@@ -67,14 +75,25 @@ def stat_chart(fig, label):
 
 def user_selection():
     available_users = get_available_users()
+    default_user = available_users[0] if available_users else None
+    available_years = get_available_years(default_user) if default_user else []
     
     return html.Div(
         [
             dcc.Dropdown(
                 id="user-dropdown",
                 options=[{"label": u, "value": u} for u in available_users],
-                value=available_users[0],
+                value=default_user,
                 clearable=False,
+                style={"flex": "1"},
+            ),
+
+            dcc.Dropdown(
+                id="year-dropdown",
+                options=[{"label": y, "value": y} for y in available_years],
+                value=available_years[0] if available_years else None,
+                clearable=False,
+                style={"flex": "1"},
             ),
 
             dcc.RadioItems(
@@ -91,7 +110,7 @@ def user_selection():
                 },
             ),
         ],
-        style={"marginBottom": "20px"}
+        style={"marginBottom": "20px", "display": "flex", "gap": "10px", "alignItems": "center"}
     )
 
     
@@ -137,7 +156,7 @@ def header_component(stats: dict):
         }
     )
 
-def averge_movies_per_month(stats: dict):
+def average_movies_per_month(stats: dict):
 
     return html.Div(
         [
