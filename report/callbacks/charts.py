@@ -10,20 +10,14 @@ from pathlib import Path
 
 
 def create_horizontal_bar_chart(data_dict, title, max_items=10):
-    """
-    Generic horizontal bar chart for stats where values are LISTS of items.
-    """
-
     if not data_dict:
         return go.Figure()
 
-    # Convert values → counts
     counted_items = {
         key: len(value) if isinstance(value, (list, tuple, set)) else value
         for key, value in data_dict.items()
     }
 
-    # Sort and take top N
     sorted_items = sorted(
         counted_items.items(),
         key=lambda x: x[1],
@@ -34,25 +28,23 @@ def create_horizontal_bar_chart(data_dict, title, max_items=10):
     values = [item[1] for item in sorted_items]
 
     fig = go.Figure(
-        data=[
-            go.Bar(
-                x=values,
-                y=labels,
-                orientation="h",
-                marker_color="#717171",
-                hovertemplate="%{y}: %{x}<extra></extra>",
-            )
-        ]
+        go.Bar(
+            x=values,
+            y=labels,
+            orientation="h",
+            marker_color="#717171",
+            hovertemplate="%{y}: %{x}<extra></extra>",
+        )
     )
 
     fig.update_layout(
         height=250,
-        width=400,
-        margin=dict(l=100, r=10, t=10, b=10),
+        autosize=True,
+        margin=dict(l=80, r=8, t=8, b=8),
         showlegend=False,
         plot_bgcolor="rgba(0,0,0,0)",
         paper_bgcolor="rgba(0,0,0,0)",
-        font=dict(color="white", size=16),
+        font=dict(color="white", size=14),
         xaxis=dict(showgrid=False, zeroline=False, showticklabels=False),
         yaxis=dict(showgrid=False, autorange="reversed"),
     )
@@ -400,6 +392,7 @@ def create_ratings_piechart(diary_data):
             traceorder="normal",  # respect order in data
             itemclick=False,
             itemdoubleclick=False,
+            #width = 500
         ),
         plot_bgcolor="rgba(0,0,0,0)",
         paper_bgcolor="rgba(0,0,0,0)",
@@ -419,7 +412,6 @@ def create_day_of_week(stats, hovered_index=None):
     day_data = stats.get("stats", {}).get("days_of_the_week", {})
     counts = [len(day_data.get(day, [])) for day in full_days]
 
-    # Color logic using index (robust)
     colors = [
         "#3A606E" if i == hovered_index else "#717171"
         for i in range(len(full_days))
@@ -440,23 +432,15 @@ def create_day_of_week(stats, hovered_index=None):
 
     fig.update_layout(
         height=120,
-        width=300,
-        margin=dict(l=8, r=8, t=8, b=8),
+        autosize=True,
+        margin=dict(l=6, r=6, t=6, b=6),
         showlegend=False,
         plot_bgcolor="rgba(0,0,0,0)",
         paper_bgcolor="rgba(0,0,0,0)",
         font=dict(color="white", size=10),
         bargap=0,
-        xaxis=dict(
-            showgrid=False,
-            showticklabels=False,
-            zeroline=False,
-        ),
-        yaxis=dict(
-            showgrid=False,
-            showticklabels=False,
-            zeroline=False,
-        ),
+        xaxis=dict(showgrid=False, showticklabels=False, zeroline=False),
+        yaxis=dict(showgrid=False, showticklabels=False, zeroline=False),
     )
 
     return fig

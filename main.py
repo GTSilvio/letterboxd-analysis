@@ -26,8 +26,14 @@ if __name__ == "__main__":
     main()
 
     """
+
+    Need to check how the weeks are calculated: for my 2024 stats it looks like I watched something at the beginning and end
+    probably an error where things are being counted incorrectly to be forced into 52 weeks
+
+    Also should check on how 
+
     To Run Type ctrl + `
-    Then paste: python main.py --user gsilvio --year 2025 --trace --force-refresh --report
+    Then paste: python main.py --user gsilvio --year 2025 --trace --report --force-refresh 
     --user:          is required;       type in your python username
     --year:          is not required;   will default to 2025
     --force-refresh: is not requred;    just will update the saved data

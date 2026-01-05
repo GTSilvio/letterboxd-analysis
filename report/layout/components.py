@@ -29,23 +29,23 @@ def stat_box(number, label):
     return html.Div(
         [
             html.Div(str(number), style={
-                "fontSize": "48px",      # bigger number
+                "fontSize": "clamp(20px, 4vw, 32px)",
                 "fontWeight": "bold",
-                "marginBottom": "5px",
             }),
             html.Div(label, style={
-                "fontSize": "32px",
+                "fontSize": "clamp(12px, 2.5vw, 16px)",
                 "opacity": 0.8,
+                "textAlign": "center",
             })
         ],
         style={
-            "display": "flex",
-            "flexDirection": "column",
-            "alignItems": "center",
+            "flex": "1 1 160px",     # responsive width
+            "maxWidth": "240px",
+            "textAlign": "center",
             "padding": "10px",
-            "minWidth": "120px",
         }
     )
+
 
 def stat_chart(fig, label):
     return html.Div(
@@ -53,18 +53,18 @@ def stat_chart(fig, label):
             dcc.Graph(
                 figure=fig,
                 config={"displayModeBar": False},
-                style={"height": "100%", "width": "100%"}
+                style={"width": "100%", "height": "120px"},
             ),
-            html.Div(label, style={"fontSize": "24px", "opacity": 0.8}),
+            html.Div(label, style={"fontSize": "14px", "opacity": 0.8}),
         ],
         style={
-            "display": "flex",
-            "flexDirection": "column",
+            "flex": "1 1 220px",
+            "maxWidth": "400px",
+            "minWidth": "180px",
             "alignItems": "center",
-            "padding": "10px",
-            "minWidth": "200px",
         }
     )
+
 
 
 
@@ -139,7 +139,9 @@ def header_component(stats: dict):
                 ],
                 style={
                     "display": "flex",
-                    "justifyContent": "space-around",
+                    "flexWrap": "wrap",
+                    "gap": "12px",
+                    "justifyContent": "space-between",
                     "textAlign": "center",
                     "marginTop": "20px",
                     #"padding": "10px 0",
@@ -172,7 +174,9 @@ def average_movies_per_month(stats: dict):
                 ],
                 style={
                     "display": "flex",
-                    "justifyContent": "space-around",
+                    "flexWrap": "wrap",
+                    "gap": "12px",
+                    "justifyContent": "space-between",
                     "textAlign": "center",
                     "marginTop": "20px",
                     #"padding": "10px 0",
@@ -202,6 +206,7 @@ def demographic_charts(stats: dict):
                 ],
                 style={
                     "display": "flex",
+                    "flexWrap": "wrap",
                     "gap": "12px",
                     "justifyContent": "space-between",
                 }

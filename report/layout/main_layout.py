@@ -28,7 +28,7 @@ def create_layout():
             #html stats showing average per month and week etc
             html.Div(id="average-per-month"),
 
-            #
+            #graphs for genrea country languages
             html.Div(id="demographic-charts")
 
         ],
