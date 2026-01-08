@@ -16,6 +16,8 @@ class MovieMasterListBuilder:
         self.master_list = {}
         self.cast_list = {}
         self.director_list = {}
+        self.full_cast_list = {}
+        self.full_director_list = {}
 
     # ---------------------------------------------------------
     # Fetch movie + member stats safely in a worker thread
@@ -50,6 +52,8 @@ class MovieMasterListBuilder:
         cache_master = f"{self.username}_{self.year}_master.json"
         cache_cast = f"{self.username}_{self.year}_cast.json"
         cache_director = f"{self.username}_{self.year}_director.json"
+        cache_full_cast = f"{self.username}_{self.year}_full_cast.json"
+        cache_full_director = f"{self.username}_{self.year}_full_director.json"
 
         # -----------------------------------------------------
         # Try loading from cache first
@@ -59,16 +63,20 @@ class MovieMasterListBuilder:
             cached_master = self.data_access.load_json(self.username, self.year, cache_master)
             cached_cast = self.data_access.load_json(self.username, self.year, cache_cast)
             cached_director = self.data_access.load_json(self.username, self.year, cache_director)
+            cached_full_cast = self.data_access.load_json(self.username, self.year, cache_full_cast)
+            cached_full_director = self.data_access.load_json(self.username, self.year, cache_full_director)
 
-            if cached_master and cached_cast and cached_director:
+            if cached_master and cached_cast and cached_director and cached_full_cast and cached_full_director:
                 self.master_list = cached_master
                 self.cast_list = cached_cast
                 self.director_list = cached_director
+                self.full_cast_list = cached_full_cast
+                self.full_director_list = cached_full_director
 
                 if self.trace:
                     print(f"Loaded all cached list for {self.username} {self.year}")
 
-                return self.master_list, self.cast_list, self.director_list
+                return self.master_list, self.cast_list, self.director_list, self.full_cast_list, self.full_director_list
 
         # -----------------------------------------------------
         # Gather all diary entries
@@ -165,6 +173,18 @@ class MovieMasterListBuilder:
                 self.cast_list[cast_slug]["appearances"] += 1
                 self.cast_list[cast_slug]["roles"].append((slug, role))
 
+                # Add to full_cast_list if runtime >= 75
+                if record.get("runtime") != 'null' and record.get("runtime") and int(record.get("runtime")) >= 75:
+                    if cast_slug not in self.full_cast_list:
+                        self.full_cast_list[cast_slug] = {
+                            "name": cast_name,
+                            "slug": cast_slug,
+                            "appearances": 0,
+                            "roles": [],
+                        }
+                    self.full_cast_list[cast_slug]["appearances"] += 1
+                    self.full_cast_list[cast_slug]["roles"].append((slug, role))
+
             # -------------------------------------------------
             # DIRECTOR LIST
             # -------------------------------------------------
@@ -191,11 +211,25 @@ class MovieMasterListBuilder:
                 self.director_list[dir_slug]["appearances"] += 1
                 self.director_list[dir_slug]["movies"].append(slug)
 
+                # Add to full_director_list if runtime >= 75
+                if record.get("runtime") != 'null' and record.get("runtime") and int(record.get("runtime")) >= 75:
+                    if dir_slug not in self.full_director_list:
+                        self.full_director_list[dir_slug] = {
+                            "name": dir_name,
+                            "slug": dir_slug,
+                            "appearances": 0,
+                            "movies": [],
+                        }
+                    self.full_director_list[dir_slug]["appearances"] += 1
+                    self.full_director_list[dir_slug]["movies"].append(slug)
+
         # -----------------------------------------------------
         # Sort cast & director lists
         # -----------------------------------------------------
         self.cast_list = dict(sorted(self.cast_list.items(), key=lambda x: x[1]["appearances"], reverse=True))
         self.director_list = dict(sorted(self.director_list.items(), key=lambda x: x[1]["appearances"], reverse=True))
+        self.full_cast_list = dict(sorted(self.full_cast_list.items(), key=lambda x: x[1]["appearances"], reverse=True))
+        self.full_director_list = dict(sorted(self.full_director_list.items(), key=lambda x: x[1]["appearances"], reverse=True))
 
         # -----------------------------------------------------
         # Save to cache
@@ -203,8 +237,10 @@ class MovieMasterListBuilder:
         self.data_access.save_json(self.username, self.year, cache_master, self.master_list)
         self.data_access.save_json(self.username, self.year, cache_cast, self.cast_list)
         self.data_access.save_json(self.username, self.year, cache_director, self.director_list)
+        self.data_access.save_json(self.username, self.year, cache_full_cast, self.full_cast_list)
+        self.data_access.save_json(self.username, self.year, cache_full_director, self.full_director_list)
 
         if self.trace:
             print(f"Saved all data lists for {self.username} {self.year}")
 
-        return self.master_list, self.cast_list, self.director_list
+        return self.master_list, self.cast_list, self.director_list, self.full_cast_list, self.full_director_list

@@ -16,10 +16,10 @@ class LetterboxdAnalysis:
         diary_data = fetcher.fetch(force_refresh=force_refresh)
 
         builder = MovieMasterListBuilder(self.user, self.year, diary_data, trace=self.trace)
-        # MovieMasterListBuilder.build() returns (master_list, cast_list, director_list)
-        master_list, cast_list, director_list = builder.build(force_refresh=force_refresh)
+        # MovieMasterListBuilder.build() returns (master_list, cast_list, director_list, full_cast_list, full_director_list)
+        master_list, cast_list, director_list, full_cast_list, full_director_list = builder.build(force_refresh=force_refresh)
 
-        calculator = StatsCalculator(diary_data, master_list, cast_list, director_list, self.year, self.user)
+        calculator = StatsCalculator(diary_data, master_list, cast_list, director_list, self.year, self.user, full_cast_list, full_director_list)
         stats = calculator.compute()
         full_stats = calculator.full_stats
 

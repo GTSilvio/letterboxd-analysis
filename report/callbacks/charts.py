@@ -230,7 +230,8 @@ def create_weekly_distribution(data):
     weekly_data = data.get("stats", {}).get("num_per_week", {})
     
     # Create all 52 weeks, filling with 0s for missing weeks
-    all_weeks = [f"week {i}" for i in range(1, 53)]
+    all_weeks = [f"week {i}" for i in range(1, 54)]
+    #weekly_date = [data.get("stats", {}).get("weeks list", {}) for i in range(1, 54)]
     counts = [len(weekly_data.get(week, [])) for week in all_weeks]
 
     fig = go.Figure(
@@ -310,8 +311,6 @@ def create_ratings_distribution(diary_data):
     )
 
     return fig
-
-import plotly.graph_objects as go
 
 def create_ratings_piechart(diary_data):
     """Create a pie chart showing movie ratings in descending star order."""

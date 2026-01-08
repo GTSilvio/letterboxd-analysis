@@ -131,10 +131,10 @@ def header_component(stats: dict):
             # ---- NEW STAT BOX ROW ----
             html.Div(
                 [
-                    stat_box(stats['stats']['yearly_movie_count'], "Movies"),
-                    stat_box(stats['stats']['yearly_review'], "Reviews"),
-                    stat_box(stats['stats']['yearly_rewatch'], "Rewatches"),
-                    stat_box(stats['stats']['yearly_like'], "Likes"),
+                    stat_box(len(stats['stats']['yearly_movie_count']), "Movies"),
+                    stat_box(len(stats['stats']['yearly_review']), "Reviews"),
+                    stat_box(len(stats['stats']['yearly_rewatch']), "Rewatches"),
+                    stat_box(len(stats['stats']['yearly_like']), "Likes"),
                     stat_box(round((stats['stats']['yearly_minutes_watched']/60), 1), "Hours"),
                 ],
                 style={
@@ -166,7 +166,7 @@ def average_movies_per_month(stats: dict):
             # ---- NEW STAT BOX ROW ----
             html.Div(
                 [
-                    stat_box(stats['stats']['yearly_movie_count'], "Movies Watched This Year"),
+                    stat_box(len(stats['stats']['yearly_movie_count']), "Movies Watched This Year"),
                     stat_box(stats['stats']['average_count_monthly'], "Average per Month"),
                     stat_box(stats['stats']['average_count_weekly'], "Average per Week"),
                     stat_chart(create_day_of_week(stats),""),
