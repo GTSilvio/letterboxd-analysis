@@ -1,7 +1,7 @@
 from dash import dcc, html, Input, Output
 import os
 from pathlib import Path
-from report.callbacks.charts import create_day_of_week, create_genre_chart, create_country_chart, create_language_chart
+from report.callbacks.charts import create_2025_pie, create_day_of_week, create_genre_chart, create_country_chart, create_language_chart, review_pie, rewatches_pie
 
 
 #----------------------------------------------------Helper-Functions----------------------------------------------------
@@ -47,13 +47,13 @@ def stat_box(number, label):
     )
 
 
-def stat_chart(fig, label):
+def stat_chart(fig, label, height="120px"):
     return html.Div(
         [
             dcc.Graph(
                 figure=fig,
                 config={"displayModeBar": False},
-                style={"width": "100%", "height": "120px"},
+                style={"width": "100%", "height": height},
             ),
             html.Div(label, style={"fontSize": "14px", "opacity": 0.8}),
         ],
@@ -169,7 +169,7 @@ def average_movies_per_month(stats: dict):
                     stat_box(len(stats['stats']['yearly_movie_count']), "Movies Watched This Year"),
                     stat_box(stats['stats']['average_count_monthly'], "Average per Month"),
                     stat_box(stats['stats']['average_count_weekly'], "Average per Week"),
-                    stat_chart(create_day_of_week(stats),""),
+                    stat_chart(create_day_of_week(stats),"", height="120px"),
 
                 ],
                 style={
@@ -193,22 +193,60 @@ def average_movies_per_month(stats: dict):
         }
     )
 
-def demographic_charts(stats: dict):
+def demographic_radio():
+    return html.Div(
+        [
+            html.P(
+                "Genres, Countries, & Languages",
+                style={
+                    "fontSize": "24px",
+                    "marginBottom": "10px",
+                },
+            ),
+            dcc.RadioItems(
+                id="most-highest",
+                options=[
+                    {"label": "Most Watched", "value": "most"},
+                    {"label": "Highest Rated", "value": "highest"},
+                ],
+                value="most",
+                labelStyle={
+                    "display": "inline-block",
+                    "marginRight": "15px",
+                    "color": "white",
+                },
+            ),
+        ],
+        style={
+            "display": "flex",
+            "color": "white",
+            "justifyContent": "space-between",
+            "alignItems": "center",
+            "marginBottom": "10px",
+            "borderBottom": "3px solid #555",
+            "paddingBottom": "10px",
+        },
+    )
+
+
+def demographic_charts(stats: dict, most_highest: bool = True):
     return html.Div(
         [
             
             # ---- NEW STAT BOX ROW ----
             html.Div(
                 [
-                    stat_chart(create_genre_chart(stats), "Top Genres"),
-                    stat_chart(create_country_chart(stats), "Top Countries"),
-                    stat_chart(create_language_chart(stats), "Top Languages"),
+                    stat_chart(create_genre_chart(stats, most_highest), "", height="250px"),
+                    stat_chart(create_country_chart(stats, most_highest), "", height="250px"),
+                    stat_chart(create_language_chart(stats, most_highest), "", height="250px"),
                 ],
                 style={
                     "display": "flex",
                     "flexWrap": "wrap",
                     "gap": "12px",
                     "justifyContent": "space-between",
+                    "marginBottom": "20px",
+                    "height": "250px",
                 }
             )
         ],
@@ -222,6 +260,59 @@ def demographic_charts(stats: dict):
         }
     )
 
+def percent_heading():
+    return html.Div(
+        [
+            html.P(
+                "Breakdown",
+                style={
+                    "fontSize": "24px",
+                    "marginBottom": "10px",
+                },
+            ),
+        ],
+        style={
+            "display": "flex",
+            "color": "white",
+            "justifyContent": "space-between",
+            "alignItems": "center",
+            "marginBottom": "10px",
+            "borderBottom": "3px solid #555",
+            "paddingBottom": "10px",
+        },
+    )
+
+def percent_charts(stats):
+    return html.Div(
+        [
+            
+            # ---- NEW STAT BOX ROW ----
+            
+            html.Div(
+                [
+                    stat_chart(create_2025_pie(stats), "", height="250px"),
+                    stat_chart(rewatches_pie(stats), "", height="250px"),
+                    stat_chart(review_pie(stats), "", height="250px"),
+                ],
+                style={
+                    "display": "flex",
+                    "flexWrap": "wrap",
+                    "gap": "12px",
+                    "justifyContent": "space-between",
+                    "marginBottom": "20px",
+                    "height": "250px",
+                }
+            )
+        ],
+        
+        style={
+            "backgroundColor": "#2b2b2b",
+            "color": "white",
+            "fontSize": "18px",
+            "padding": "20px",
+            "borderRadius": "8px",
+        }
+    )
 
 def ratings_distribution_chart():
     """Component for the ratings distribution histogram."""

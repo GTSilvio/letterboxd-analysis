@@ -31,10 +31,13 @@ if __name__ == "__main__":
 
     need to check what order things are added make sure that movies are added in the right order
 
+    check charts make sure that they are using stats and not diary data
+    also finish editing the weeks data
+
     center textboxes and stuff
 
     To Run Type ctrl + `
-    Then paste: python main.py --user gsilvio --year 2025 --trace --report --force-refresh
+    Then paste: python main.py --user gsilvio --year 2025 --trace --report --force-refresh 
     --user:          is required;       type in your python username
     --year:          is not required;   will default to 2025
     --force-refresh: is not requred;    just will update the saved data

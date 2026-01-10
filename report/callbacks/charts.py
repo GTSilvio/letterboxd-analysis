@@ -9,7 +9,7 @@ from pathlib import Path
 
 
 
-def create_horizontal_bar_chart(data_dict, title, max_items=10):
+def create_horizontal_bar_chart(data_dict, max_items=10, height=250):
     if not data_dict:
         return go.Figure()
 
@@ -38,7 +38,7 @@ def create_horizontal_bar_chart(data_dict, title, max_items=10):
     )
 
     fig.update_layout(
-        height=250,
+        height=height,
         autosize=True,
         margin=dict(l=80, r=8, t=8, b=8),
         showlegend=False,
@@ -51,7 +51,71 @@ def create_horizontal_bar_chart(data_dict, title, max_items=10):
 
     return fig
 
+def create_pie_chart(data_dict, title="", max_items=10, colors=None):
+    """
+    Create a pie chart from a data dictionary.
+    
+    Parameters:
+    - data_dict: Dictionary where keys are labels and values are either counts or lists
+    - title: Chart title
+    - max_items: Maximum number of items to show
+    - colors: Optional list of colors for the pie slices
+    """
+    if not data_dict:
+        return go.Figure()
 
+    # Count items (handle both count values and list lengths)
+    counted_items = {
+        key: len(value) if isinstance(value, (list, tuple, set)) else value
+        for key, value in data_dict.items()
+    }
+
+    # Sort by count descending and take top items
+    sorted_items = sorted(
+        counted_items.items(),
+        key=lambda x: x[1],
+        reverse=True
+    )[:max_items]
+
+    labels = [item[0] for item in sorted_items]
+    values = [item[1] for item in sorted_items]
+
+    # Default color scheme if none provided
+    if colors is None:
+        colors = [
+            '#3A606E', '#4D6E76', '#607B7D', '#718580',
+            '#828E82', '#969E88', '#AAAE8E', '#C5C7B7',
+            '#D3D4CC', '#E0E0E0'
+        ]
+
+    fig = go.Figure(
+        data=[
+            go.Pie(
+                labels=labels,
+                values=values,
+                textinfo="percent",
+                hovertemplate="<b>%{label}</b><br>Count: %{value}<br>%{percent}<extra></extra>",
+                marker=dict(colors=colors[:len(labels)]),
+                sort=False,
+            )
+        ]
+    )
+
+    fig.update_layout(
+        title=title,
+        showlegend=True,
+        legend=dict(
+            title="Categories",
+            traceorder="normal",
+            itemclick=False,
+            itemdoubleclick=False,
+        ),
+        plot_bgcolor="rgba(0,0,0,0)",
+        paper_bgcolor="rgba(0,0,0,0)",
+        font_color="white",
+    )
+
+    return fig
 
 #--------------------------------------------------------------------------------------------------------------------------
 
@@ -444,19 +508,83 @@ def create_day_of_week(stats, hovered_index=None):
 
     return fig
 
-def create_genre_chart(stats):
-    return create_horizontal_bar_chart(stats["stats"]["genres"],"Top Genres")
+def create_genre_chart(stats,genre: bool=True):
+    if genre:
+        this = "genres"
+    else:
+        this = "genre_averages"
+    #"genres"
+    #"genre_averages"
+    return create_horizontal_bar_chart(stats["stats"][this],)
 
 
-def create_country_chart(stats):
-    return create_horizontal_bar_chart(
-        stats["stats"]["country"],
-        "Top Countries"
+def create_country_chart(stats,country: bool=True):
+    if country:
+        this = "country"
+    else:
+        this = "country_averages"
+    #"country"
+    #"country_averages"
+    return create_horizontal_bar_chart(stats["stats"][this],)
+
+
+def create_language_chart(stats,language: bool=True):
+    if language:
+        this = "language"
+    else:
+        this = "language_averages"
+    #"language"
+    #"language_averages"
+    return create_horizontal_bar_chart(stats["stats"][this],)
+
+def create_2025_pie(stats):
+    current_year = int(stats["info"]["year"])
+
+    current_year_movies = stats.get('stats', {}).get("percent_current_years", 0)
+    total_movies = 1 - current_year_movies
+
+    data = [
+        current_year_movies,
+        total_movies
+    ]
+
+    labels = [str(current_year), "Older"]
+
+    fig = go.Figure(
+        data=[
+            go.Pie(
+                labels=labels,
+                values=data,
+                textinfo="percent",
+                hovertemplate="<b>%{label}</b><br>Count: %{value}<br>%{percent}<extra></extra>",
+                sort=False,
+            )
+        ]
     )
 
-
-def create_language_chart(stats):
-    return create_horizontal_bar_chart(
-        stats["stats"]["language"],
-        "Top Languages"
+    fig.update_layout(
+        showlegend=False,
+        plot_bgcolor="rgba(0,0,0,0)",
+        paper_bgcolor="rgba(0,0,0,0)",
+        font_color="white",
     )
+
+    return fig
+
+def rewatches_pie(stats):
+    rewatches = stats.get("stats", {}).get("yearly_rewatch", {})
+    watches = stats.get("stats", {}).get("yearly_movie_count", {})
+    data = {
+        "Rewatches": len(rewatches),
+        "Watches": (len(watches) - len(rewatches)),
+    }
+    return create_pie_chart(data)
+
+def review_pie(stats):
+    reviews = stats.get("stats", {}).get("yearly_review", {})
+    watches = stats.get("stats", {}).get("yearly_movie_count", {})
+    data = {
+        "Reviewed": len(reviews),
+        "Unreviewed": (len(watches) - len(reviews)),
+    }
+    return create_pie_chart(data)

@@ -1,6 +1,6 @@
 from dash import Input, Output, dash_table
 from report.data_loader import load_stats, load_diary
-from report.layout.components import header_component, average_movies_per_month, demographic_charts, get_available_years
+from report.layout.components import header_component, average_movies_per_month, demographic_charts, get_available_years, percent_charts
 from pathlib import Path
 from report.callbacks.charts import create_weekly_distribution, create_monthly_distribution, create_ratings_distribution
 
@@ -118,13 +118,16 @@ def register_interaction_callbacks(app, stats, diary_data):
     
     @app.callback(
         Output("demographic-charts", "children"),
-        [Input("user-dropdown", "value"), Input("year-dropdown", "value"), Input("movie-filter", "value")],
+        [Input("user-dropdown", "value"), Input("year-dropdown", "value"), Input("movie-filter", "value"), Input("most-highest", "value")],
     )
-    def update_demographic_charts(selected_user, selected_year, movie_filter):
+    def update_demographic_charts(selected_user, selected_year, movie_filter, most_highest):
         if not selected_user or not selected_year:
             return "Select a user and year to begin"
 
         full_stats = (movie_filter == "full")
+
+        most_highest = (most_highest == "most")
+
         stats = load_stats(
             cache_dir=str(CACHE_DIR),
             profile=selected_user,
@@ -132,4 +135,23 @@ def register_interaction_callbacks(app, stats, diary_data):
             full_stats=full_stats,
         )
 
-        return demographic_charts(stats)
+        return demographic_charts(stats, most_highest)
+    
+    @app.callback(
+        Output("percent-charts", "children"),
+        [Input("user-dropdown", "value"), Input("year-dropdown", "value"), Input("movie-filter", "value")],
+    )
+    def update_percent_charts(selected_user, selected_year, movie_filter):
+        if not selected_user or not selected_year:
+            return "Select a user and year to begin"
+
+        full_stats = (movie_filter == "full")
+
+        stats = load_stats(
+            cache_dir=str(CACHE_DIR),
+            profile=selected_user,
+            year=int(selected_year),
+            full_stats=full_stats,
+        )
+
+        return percent_charts(stats)

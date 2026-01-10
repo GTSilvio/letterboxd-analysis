@@ -1,5 +1,5 @@
 from dash import html, dcc
-from .components import header_component, user_selection, monthly_movies_chart, ratings_distribution_chart
+from .components import header_component, percent_heading, user_selection, monthly_movies_chart, ratings_distribution_chart, demographic_radio
 
 def create_layout():
 
@@ -29,7 +29,21 @@ def create_layout():
             html.Div(id="average-per-month"),
 
             #graphs for genrea country languages
-            html.Div(id="demographic-charts")
+            html.Div(
+                [
+                    demographic_radio(),
+                    html.Div(id="demographic-charts"),
+                ]
+            ),
+
+            #graphs for percent breakdowns
+            html.Div(
+                [
+                    percent_heading(),
+                    html.Div(id="percent-charts"),
+                ]
+            ),
+
 
         ],
 

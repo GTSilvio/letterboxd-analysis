@@ -678,12 +678,12 @@ class StatsCalculator:
                             full_genre_total += float(rating)
                             full_genre_num += 1
 
-            if genre_num > 4:
+            if genre_num >= 4:
                 genre_averages[genere] = round(genre_total / genre_num, 2)
             else:
                 pass
 
-            if full_genre_num > 4:
+            if full_genre_num >= 4:
                 full_genre_averages[genere] = round(full_genre_total / full_genre_num, 2)
             else:
                 pass
@@ -736,7 +736,7 @@ class StatsCalculator:
                             full_country_total += float(rating)
                             full_country_num += 1
 
-            if country_num > 4:
+            if country_num >= 4:
                 country_averages[country] = round(country_total / country_num, 2)
 
             if full_country_num > 4:
@@ -807,7 +807,7 @@ class StatsCalculator:
                             full_language_total += float(rating)
                             full_language_num += 1
 
-            if language_num > 4:
+            if language_num >= 4:
                 language_averages[language] = round(language_total / language_num, 2)
 
             if full_language_num > 4:
@@ -863,10 +863,10 @@ class StatsCalculator:
                             full_studio_total += float(rating)
                             full_studio_num += 1
 
-            if studio_num > 4:
+            if studio_num >= 4:
                 studio_averages[studio] = round(studio_total / studio_num, 2)
 
-            if full_studio_num > 4:
+            if full_studio_num >= 4:
                 full_studio_averages[studio] = round(full_studio_total / full_studio_num, 2)
 
 
@@ -893,20 +893,40 @@ class StatsCalculator:
         
         #Release Year
         release_dict = {}
+        full_release_dict = {}
 
         for movie_num, movie_data in self.master_list.items():
+
+            runtime = movie_data.get("runtime")
+
             if 'released' in movie_data and movie_data['released'] != []:
-                release_dict[movie_num] = movie_data['released']
+
+                if movie_data['released'] not in release_dict:
+                    release_dict[movie_data['released']] = []
+                    release_dict[movie_data['released']].append(str(movie_num))
+                else:
+                    release_dict[movie_data['released']].append(str(movie_num))
+
+                if runtime != 'null' and int(runtime) >= self.full_movie:
+
+                    if movie_data['released'] not in full_release_dict:
+                        full_release_dict[movie_data['released']] = []
+                        full_release_dict[movie_data['released']].append(str(movie_num))
+                    else:
+                        full_release_dict[movie_data['released']].append(str(movie_num))
 
         #% in current year
         current_year_counter = 0
         full_current_year_counter = 0
 
-        for movie_num, release_year in release_dict.items():
-            if release_year == self.year:
-                current_year_counter += 1
-                if self.master_list[movie_num]['runtime'] != 'null' and int(self.master_list[movie_num]['runtime']) >= self.full_movie:
-                    full_current_year_counter += 1
+        for release_year, movie_list in release_dict.items():
+            for movie_num in movie_list:
+                runtime = self.master_list[movie_num].get("runtime")
+                if release_year == self.year:
+                    current_year_counter += 1
+    
+                    if runtime != 'null' and int(runtime) >= self.full_movie:
+                        full_current_year_counter += 1
 
         percent_current_year = round((current_year_counter / len(yearly_count)), 2)
         full_percent_current_year = round((full_current_year_counter / len(full_yearly_count)), 2)
@@ -1192,7 +1212,7 @@ class StatsCalculator:
             "language_averages": full_language_averages,
             "studio": full_studio_dict,
             "studio_averages": full_studio_averages,
-            "releases": release_dict,
+            "releases": full_release_dict,
             "percent_current_years": full_percent_current_year,
             "rarest_movies": full_rarest,
             "popular_movies": full_popular,
