@@ -290,9 +290,9 @@ def percent_charts(stats):
             
             html.Div(
                 [
-                    stat_chart(create_2025_pie(stats), "", height="250px"),
-                    stat_chart(rewatches_pie(stats), "", height="250px"),
-                    stat_chart(review_pie(stats), "", height="250px"),
+                    stat_chart(create_2025_pie(stats), "", height="400px"),
+                    stat_chart(rewatches_pie(stats), "", height="400px"),
+                    stat_chart(review_pie(stats), "", height="400px"),
                 ],
                 style={
                     "display": "flex",
@@ -300,7 +300,7 @@ def percent_charts(stats):
                     "gap": "12px",
                     "justifyContent": "space-between",
                     "marginBottom": "20px",
-                    "height": "250px",
+                    "height": "400px",
                 }
             )
         ],

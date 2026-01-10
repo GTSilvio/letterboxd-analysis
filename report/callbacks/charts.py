@@ -540,8 +540,8 @@ def create_language_chart(stats,language: bool=True):
 def create_2025_pie(stats):
     current_year = int(stats["info"]["year"])
 
-    current_year_movies = stats.get('stats', {}).get("percent_current_years", 0)
-    total_movies = 1 - current_year_movies
+    current_year_movies = round(stats.get('stats', {}).get("percent_current_years", 0) * len(stats.get('stats', {}).get("yearly_movie_count", 1)),0)
+    total_movies = round(len(stats.get('stats', {}).get("yearly_movie_count", 1)) - current_year_movies,0)
 
     data = [
         current_year_movies,
@@ -558,6 +558,12 @@ def create_2025_pie(stats):
                 textinfo="percent",
                 hovertemplate="<b>%{label}</b><br>Count: %{value}<br>%{percent}<extra></extra>",
                 sort=False,
+                marker=dict(
+                    colors=[
+                        '#3A606E',
+                        '#717171'
+                    ]
+                )
             )
         ]
     )
@@ -574,17 +580,73 @@ def create_2025_pie(stats):
 def rewatches_pie(stats):
     rewatches = stats.get("stats", {}).get("yearly_rewatch", {})
     watches = stats.get("stats", {}).get("yearly_movie_count", {})
-    data = {
-        "Rewatches": len(rewatches),
-        "Watches": (len(watches) - len(rewatches)),
-    }
-    return create_pie_chart(data)
+    data = [
+        (len(watches) - len(rewatches)),
+        len(rewatches)
+    ]
+
+    labels = ["New Watches", "Rewatched"]
+    
+    fig = go.Figure(
+        data=[
+            go.Pie(
+                labels=labels,
+                values=data,
+                textinfo="percent",
+                hovertemplate="<b>%{label}</b><br>Count: %{value}<br>%{percent}<extra></extra>",
+                sort=False,
+                marker=dict(
+                    colors=[
+                        '#3A606E',
+                        '#717171'
+                    ]
+                )
+            )
+        ]
+    )
+
+    fig.update_layout(
+        showlegend=False,
+        plot_bgcolor="rgba(0,0,0,0)",
+        paper_bgcolor="rgba(0,0,0,0)",
+        font_color="white",
+    )
+
+    return fig
 
 def review_pie(stats):
     reviews = stats.get("stats", {}).get("yearly_review", {})
     watches = stats.get("stats", {}).get("yearly_movie_count", {})
-    data = {
-        "Reviewed": len(reviews),
-        "Unreviewed": (len(watches) - len(reviews)),
-    }
-    return create_pie_chart(data)
+    data = [
+        len(reviews),
+        (len(watches) - len(reviews)),
+    ]
+
+    labels = ["Reviewed", "Unreviewed"]
+
+    fig = go.Figure(
+        data=[
+            go.Pie(
+                labels=labels,
+                values=data,
+                textinfo="percent",
+                hovertemplate="<b>%{label}</b><br>Count: %{value}<br>%{percent}<extra></extra>",
+                sort=False,
+                marker=dict(
+                    colors=[
+                        '#3A606E',
+                        '#717171'
+                    ]
+                )
+            )
+        ]
+    )
+
+    fig.update_layout(
+        showlegend=False,
+        plot_bgcolor="rgba(0,0,0,0)",
+        paper_bgcolor="rgba(0,0,0,0)",
+        font_color="white",
+    )
+
+    return fig
