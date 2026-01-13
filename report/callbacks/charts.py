@@ -292,19 +292,27 @@ def create_weekly_distribution(data):
 
     #Extract weekly data from stats
     weekly_data = data.get("stats", {}).get("num_per_week", {})
+
+    #week dates
+    week_dates = data.get("stats", {}).get("weeks list", {})
     
     # Create all 52 weeks, filling with 0s for missing weeks
     all_weeks = [f"week {i}" for i in range(1, 54)]
-    #weekly_date = [data.get("stats", {}).get("weeks list", {}) for i in range(1, 54)]
     counts = [len(weekly_data.get(week, [])) for week in all_weeks]
+    dates = []
+
+    for week_dict in week_dates:
+            for week_label, range_label in week_dict.items():
+                dates.append(range_label)
 
     fig = go.Figure(
         data=[
             go.Bar(
                 x=all_weeks,
                 y=counts,
+                customdata=dates,
                 marker_color="#717171",
-                hovertemplate="<b>%{x}</b><br>Movies: %{y}<extra></extra>",
+                hovertemplate="<b>%{x}</b><br>%{customdata}<br>Movies: %{y}<extra></extra>",
             )
         ]
     )

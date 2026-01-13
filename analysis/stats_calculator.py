@@ -72,6 +72,8 @@ class StatsCalculator:
                 f"week {week_number}": _format_week_label(start_of_year, first_week_end)
             })
 
+            #weeks[f"week {week_number}"] = _format_week_label(start_of_year, first_week_end)
+
             week_number += 1
             current_start = first_week_end + timedelta(days=1)
 
