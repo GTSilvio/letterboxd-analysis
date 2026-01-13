@@ -2,12 +2,19 @@ from dash import Input, Output
 import plotly.graph_objects as go
 from report.data_loader import load_stats, load_diary
 from pathlib import Path
+import pycountry
 
 
 
 #--------------------------------------------------------------------------------------------------------------------------
 
 
+
+def country_name_to_iso3(name):
+    try:
+        return pycountry.countries.lookup(name).alpha_3
+    except LookupError:
+        return None
 
 def create_horizontal_bar_chart(data_dict, max_items=10, height=250):
     if not data_dict:
@@ -185,6 +192,23 @@ def register_chart_callbacks(app, stats, diary_data):
             full_stats=full_stats,
         )
         return create_weekly_distribution(stats)
+    
+    @app.callback(
+        Output("world-map", "figure"),
+        [Input("user-dropdown", "value"), Input("year-dropdown", "value"), Input("movie-filter", "value")],
+    )
+    def render_world_map(selected_user, selected_year, movie_filter):
+        if not selected_user or not selected_year:
+            return {}
+        
+        full_stats = (movie_filter == "full")
+        stats = load_stats(
+            cache_dir=str(CACHE_DIR),
+            profile=selected_user,
+            year=int(selected_year),
+            full_stats=full_stats,
+        )
+        return create_country_world_map(stats)
         
 
     # --------------------------------------------------
@@ -655,6 +679,47 @@ def review_pie(stats):
         plot_bgcolor="rgba(0,0,0,0)",
         paper_bgcolor="rgba(0,0,0,0)",
         font_color="white",
+    )
+
+    return fig
+
+def create_country_world_map(stats):
+    country_data = stats.get("stats", {}).get("country", {})
+
+    iso_codes = []
+    values = []
+
+    for country in country_data.keys():
+        iso = country_name_to_iso3(country)
+        if iso:
+            iso_codes.append(iso)
+            values.append(1)
+
+    fig = go.Figure(
+        go.Choropleth(
+            locations=iso_codes,
+            z=values,
+            locationmode="ISO-3",
+            colorscale=[
+                [0, "#555555"],   # grey
+                [1, "#2ecc71"],   # green
+            ],
+            showscale=False,
+            marker_line_color="black",
+            marker_line_width=0.2,
+            hovertemplate="<b>%{location}</b><extra></extra>",
+        )
+    )
+
+    fig.update_layout(
+        geo=dict(
+            showframe=False,
+            showcoastlines=False,
+            projection_type="natural earth",
+            bgcolor="rgba(0,0,0,0)",
+        ),
+        margin=dict(l=0, r=0, t=0, b=0),
+        paper_bgcolor="rgba(0,0,0,0)",
     )
 
     return fig

@@ -44,6 +44,8 @@ def create_layout():
                 ]
             ),
 
+            dcc.Graph(id="world-map", config={'displayModeBar': False}),
+
 
         ],
 
