@@ -1,7 +1,7 @@
 from dash import dcc, html, Input, Output
 import os
 from pathlib import Path
-from report.callbacks.charts import create_2025_pie, create_day_of_week, create_genre_chart, create_country_chart, create_language_chart, review_pie, rewatches_pie
+from report.callbacks.charts import create_2025_pie, create_day_of_week, create_genre_chart, create_country_chart, create_language_chart, create_studio_chart, review_pie, rewatches_pie
 
 
 #----------------------------------------------------Helper-Functions----------------------------------------------------
@@ -197,7 +197,7 @@ def demographic_radio():
     return html.Div(
         [
             html.P(
-                "Genres, Countries, & Languages",
+                "Genres, Languages, Countries, & Studios",
                 style={
                     "fontSize": "24px",
                     "marginBottom": "10px",
@@ -237,8 +237,9 @@ def demographic_charts(stats: dict, most_highest: bool = True):
             html.Div(
                 [
                     stat_chart(create_genre_chart(stats, most_highest), "", height="250px"),
-                    stat_chart(create_country_chart(stats, most_highest), "", height="250px"),
                     stat_chart(create_language_chart(stats, most_highest), "", height="250px"),
+                    stat_chart(create_country_chart(stats, most_highest), "", height="250px"),
+                    stat_chart(create_studio_chart(stats, most_highest), "", height="250px"),
                 ],
                 style={
                     "display": "flex",

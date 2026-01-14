@@ -5,6 +5,14 @@ from pathlib import Path
 import pycountry
 
 
+#--------------------------------------------------------------------------------------------------------------------------
+
+
+green = "#429163"
+map_green ="#2ecc71"
+light_grey = '#717171'
+
+
 
 #--------------------------------------------------------------------------------------------------------------------------
 
@@ -15,6 +23,12 @@ def country_name_to_iso3(name):
         return pycountry.countries.lookup(name).alpha_3
     except LookupError:
         return None
+    
+def iso3_to_country_name(iso):
+    try:
+        return pycountry.countries.get(alpha_3=iso).name
+    except:
+        return iso
 
 def create_horizontal_bar_chart(data_dict, max_items=10, height=250):
     if not data_dict:
@@ -569,6 +583,15 @@ def create_language_chart(stats,language: bool=True):
     #"language_averages"
     return create_horizontal_bar_chart(stats["stats"][this],)
 
+def create_studio_chart(stats, studio: bool=True):
+    if studio:
+        this = "studio"
+    else:
+        this = "studio_averages"
+    #"studio"
+    #"studio_averages"
+    return create_horizontal_bar_chart(stats["stats"][this],)
+
 def create_2025_pie(stats):
     current_year = int(stats["info"]["year"])
 
@@ -592,8 +615,8 @@ def create_2025_pie(stats):
                 sort=False,
                 marker=dict(
                     colors=[
-                        '#3A606E',
-                        '#717171'
+                        green,
+                        light_grey
                     ]
                 )
             )
@@ -629,8 +652,8 @@ def rewatches_pie(stats):
                 sort=False,
                 marker=dict(
                     colors=[
-                        '#3A606E',
-                        '#717171'
+                        green,
+                        light_grey
                     ]
                 )
             )
@@ -666,8 +689,8 @@ def review_pie(stats):
                 sort=False,
                 marker=dict(
                     colors=[
-                        '#3A606E',
-                        '#717171'
+                        green,
+                        light_grey
                     ]
                 )
             )
@@ -686,28 +709,51 @@ def review_pie(stats):
 def create_country_world_map(stats):
     country_data = stats.get("stats", {}).get("country", {})
 
-    iso_codes = []
-    values = []
-
-    for country in country_data.keys():
+    # Map watched countries → ISO → count
+    watched_iso = {}
+    for country, movies in country_data.items():
         iso = country_name_to_iso3(country)
         if iso:
-            iso_codes.append(iso)
+            watched_iso[iso] = len(movies)
+
+    locations = []
+    values = []
+    hover_text = []
+
+    # Iterate over ALL countries
+    for c in pycountry.countries:
+        iso = c.alpha_3
+        locations.append(iso)
+
+        if iso in watched_iso:
             values.append(1)
+            hover_text.append(
+                f"<b>{c.name}</b><br>Movies: {watched_iso[iso]}"
+            )
+        else:
+            values.append(0)
+            hover_text.append(f"<b>{c.name}</b><br>No movies")
 
     fig = go.Figure(
         go.Choropleth(
-            locations=iso_codes,
+            locations=locations,
             z=values,
             locationmode="ISO-3",
+
             colorscale=[
-                [0, "#555555"],   # grey
-                [1, "#2ecc71"],   # green
+                [0.0, "#3a3a3a"],   # dark grey (not selected)
+                [1.0, green],   # green (selected)
             ],
+            zmin=0,
+            zmax=1,
+
             showscale=False,
+
             marker_line_color="black",
-            marker_line_width=0.2,
-            hovertemplate="<b>%{location}</b><extra></extra>",
+            marker_line_width=0.4,
+
+            text=hover_text,
+            hovertemplate="%{text}<extra></extra>",
         )
     )
 
@@ -716,10 +762,13 @@ def create_country_world_map(stats):
             showframe=False,
             showcoastlines=False,
             projection_type="natural earth",
-            bgcolor="rgba(0,0,0,0)",
+            lakecolor="rgba(0,0,0,0)",
+            bgcolor="#2b2b2b",
+            landcolor="#3a3a3a",
         ),
-        margin=dict(l=0, r=0, t=0, b=0),
         paper_bgcolor="rgba(0,0,0,0)",
+        margin=dict(l=0, r=0, t=0, b=0),
     )
 
     return fig
+
