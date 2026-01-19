@@ -85,6 +85,24 @@ class MovieMasterListBuilder:
         for month_data in self.diary_data.values():
             all_entries.extend(month_data.get("entries", {}).values())
 
+        # Sort entries by date, and reverse order for movies on the same day
+        from collections import defaultdict
+        entries_by_date = defaultdict(list)
+        for entry in all_entries:
+            date_obj = entry.get("date")
+            # Convert date dict to tuple for sorting (year, month, day)
+            if isinstance(date_obj, dict):
+                date_key = (date_obj.get("year"), date_obj.get("month"), date_obj.get("day"))
+            else:
+                date_key = date_obj
+            entries_by_date[date_key].append(entry)
+
+        # Rebuild all_entries with proper ordering
+        all_entries = []
+        for date_key in sorted(entries_by_date.keys()):
+            # Reverse the order for same-day movies
+            all_entries.extend(reversed(entries_by_date[date_key]))
+
         # -----------------------------------------------------
         # Fetch movie details in parallel
         # -----------------------------------------------------
@@ -97,7 +115,7 @@ class MovieMasterListBuilder:
                 slug, details = future.result()
                 results[slug] = details
 
-                # ⬇️ THIS is the correct place for the trace print
+                #THIS is the correct place for the trace print
                 if self.trace and i % 10 == 0:
                     print(f"Fetched details for {i} movies...")
 

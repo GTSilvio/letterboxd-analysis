@@ -45,7 +45,7 @@ if __name__ == "__main__":
     5. create a file that will download images for actors, directors, movies etc for each person and add them to their cache
 
     To Run Type ctrl + `
-    Then paste: python main.py --user gsilvio --year 2025 --trace --report --force-refresh 
+    Then paste: python main.py --user bonnegarcons --year 2024 --trace --force-refresh --report
     --user:          is required;       type in your python username
     --year:          is not required;   will default to 2025
     --force-refresh: is not requred;    just will update the saved data
